@@ -5,13 +5,13 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Typography,
   Box,
 } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
 import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
+import logo from "../../../assets/logo.png";
 import { NavLink, useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
@@ -31,19 +31,13 @@ export function Sidebar() {
         },
       }}
     >
-      <Toolbar sx={{ px: 3 }}>
-        <Box>
-          <Typography
-            variant="h6"
-            color="primary.dark"
-            sx={{ lineHeight: 1.1 }}
-          >
-            Cadastro
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Gestão local
-          </Typography>
-        </Box>
+      <Toolbar sx={{ px: 3, justifyContent: "center" }}>
+        <Box
+          component="img"
+          src={logo}
+          alt="Logo"
+          sx={{ maxWidth: "80%", maxHeight: 56, objectFit: "contain" }}
+        />
       </Toolbar>
       <List sx={{ px: 1.5, pt: 2 }}>
         <ListItemButton
