@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Snackbar, Step, StepLabel, Stepper, Typography } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Snackbar, Stack, Step, StepLabel, Stepper, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { clientSchema } from '../domain/clientSchema'
 import type { ClientEntry, ClientFormData } from '../domain/types'
@@ -80,12 +80,13 @@ export function ClientFormModal({ editTarget, onClosed, viewOnly, externalOpen, 
     handleClose()
   }
 
-  const step = [
+  const allSteps = [
     <Step1BasicData key="basic" control={control} register={register} errors={errors} watch={watch} setValue={setValue} onTypeChange={handleTypeChange} readOnly={viewOnly} />,
     <Step2Location key="location" control={control} register={register} errors={errors} watch={watch} setValue={setValue} readOnly={viewOnly} />,
     <Step3Contacts key="contacts" control={control} register={register} errors={errors} watch={watch} setValue={setValue} readOnly={viewOnly} />,
     <Step4Documents key="documents" control={control} register={register} errors={errors} watch={watch} setValue={setValue} readOnly={viewOnly} />,
-  ][currentStep]
+  ]
+  const step = allSteps[currentStep]
 
   return (
     <>
@@ -93,11 +94,16 @@ export function ClientFormModal({ editTarget, onClosed, viewOnly, externalOpen, 
         <DialogTitle>{viewOnly ? 'Visualizar cadastro' : editTarget ? 'Editar cadastro' : 'Novo cadastro'}</DialogTitle>
         <Divider />
         <DialogContent sx={{ pt: 3 }}>
-          <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 4 }}>
-            {steps.map((label) => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
-          </Stepper>
-          {step}
-          {Object.keys(errors).length > 0 && currentStep === 3 && <Typography color="error" variant="caption" sx={{ display: 'block', mt: 2 }}>Revise os campos obrigatórios antes de salvar.</Typography>}
+          {!viewOnly && (
+            <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 4 }}>
+              {steps.map((label) => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
+            </Stepper>
+          )}
+          {viewOnly ? (
+            <Stack spacing={3} divider={<Divider />}>{allSteps}</Stack>
+          ) : (
+            <>{step}{Object.keys(errors).length > 0 && currentStep === 3 && <Typography color="error" variant="caption" sx={{ display: 'block', mt: 2 }}>Revise os campos obrigatórios antes de salvar.</Typography>}</>
+          )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           {viewOnly ? (
