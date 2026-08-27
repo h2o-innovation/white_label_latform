@@ -7,6 +7,7 @@ export interface User {
   apellido: string;
   telefono: string;
   correo: string;
+  password: string; // stored as-is; hash before persisting once a backend is added
   createdAt: string;
 }
 
