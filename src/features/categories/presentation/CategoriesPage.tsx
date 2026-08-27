@@ -8,12 +8,15 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import EditOutlined from "@mui/icons-material/EditOutlined";
+import { useNavigate } from "react-router-dom";
 import { useCategoriesStore } from "../infrastructure/categoriesStore";
 import {
   useFormsStore,
@@ -23,20 +26,30 @@ import {
 export function CategoriesPage() {
   const groups = useCategoriesStore((s) => s.groups);
   const addGroup = useCategoriesStore((s) => s.addGroup);
+  const updateGroup = useCategoriesStore((s) => s.updateGroup);
+  const navigate = useNavigate();
   const allForms = useFormsStore((s) => s.categories.filter((c) => !c.route));
 
   const [open, setOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<typeof groups[0] | null>(null);
   const [name, setName] = useState("");
   const [selectedForms, setSelectedForms] = useState<FormCategory[]>([]);
 
+  const openCreate = () => { setEditTarget(null); setName(""); setSelectedForms([]); setOpen(true); };
+
+  const openEdit = (e: React.MouseEvent, group: typeof groups[0]) => {
+    e.stopPropagation();
+    setEditTarget(group);
+    setName(group.name);
+    setSelectedForms(allForms.filter((f) => group.formIds.includes(f.id)));
+    setOpen(true);
+  };
+
   const handleSave = () => {
     if (!name.trim()) return;
-    addGroup(
-      name.trim(),
-      selectedForms.map((f) => f.id),
-    );
-    setName("");
-    setSelectedForms([]);
+    const formIds = selectedForms.map((f) => f.id);
+    if (editTarget) updateGroup(editTarget.id, name.trim(), formIds);
+    else addGroup(name.trim(), formIds);
     setOpen(false);
   };
 
@@ -59,10 +72,13 @@ export function CategoriesPage() {
           <Paper
             key={group.id}
             component={ButtonBase}
+            onClick={() => navigate(`/categories/${group.id}`)}
             sx={{
               ...blockSx,
               bgcolor: "grey.100",
+              position: "relative",
               "&:hover": { bgcolor: "grey.200" },
+              "&:hover .edit-btn": { opacity: 1 },
             }}
           >
             <Typography variant="subtitle1" fontWeight={600}>
@@ -72,11 +88,19 @@ export function CategoriesPage() {
               {group.formIds.length}{" "}
               {group.formIds.length === 1 ? "formulário" : "formulários"}
             </Typography>
+            <IconButton
+              className="edit-btn"
+              size="small"
+              onClick={(e) => openEdit(e, group)}
+              sx={{ position: "absolute", top: 6, right: 6, opacity: 0, transition: "opacity 0.15s" }}
+            >
+              <EditOutlined fontSize="small" />
+            </IconButton>
           </Paper>
         ))}
         <Paper
           component={ButtonBase}
-          onClick={() => setOpen(true)}
+          onClick={() => openCreate()}
           sx={{
             ...blockSx,
             bgcolor: "primary.main",
@@ -94,7 +118,7 @@ export function CategoriesPage() {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>Nova categoria</DialogTitle>
+        <DialogTitle>{editTarget ? "Editar categoria" : "Nova categoria"}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -126,12 +150,8 @@ export function CategoriesPage() {
           <Button color="inherit" onClick={() => setOpen(false)}>
             Cancelar
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            disabled={!name.trim()}
-          >
-            Criar
+          <Button variant="contained" onClick={handleSave} disabled={!name.trim()}>
+            {editTarget ? "Salvar" : "Criar"}
           </Button>
         </DialogActions>
       </Dialog>

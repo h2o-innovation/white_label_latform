@@ -3,6 +3,7 @@ import AddOutlined from "@mui/icons-material/AddOutlined";
 import { useLocation, useMatch } from "react-router-dom";
 import { useModalStore } from "../../stores/modalStore";
 import { useFormsStore } from "../../../features/forms/infrastructure/formsStore";
+import { useCategoriesStore } from "../../../features/categories/infrastructure/categoriesStore";
 
 const titles: Record<string, string> = {
   "/clients": "Clientes",
@@ -15,14 +16,19 @@ const titles: Record<string, string> = {
 export function Header() {
   const location = useLocation();
   const formsMatch = useMatch("/forms/:categoryId");
-  const categories = useFormsStore((s) => s.categories);
+  const categoriesMatch = useMatch("/categories/:groupId");
+  const formCategories = useFormsStore((s) => s.categories);
+  const groups = useCategoriesStore((s) => s.groups);
   const openModal = useModalStore((state) => state.openModal);
   const isClientsPage = location.pathname === "/clients";
 
   const title = formsMatch
-    ? (categories.find((c) => c.id === formsMatch.params.categoryId)?.name ??
-      "Formulário")
-    : (titles[location.pathname] ?? "Cadastro Local");
+    ? (formCategories.find((c) => c.id === formsMatch.params.categoryId)
+        ?.name ?? "Formulário")
+    : categoriesMatch
+      ? (groups.find((g) => g.id === categoriesMatch.params.groupId)?.name ??
+        "Categoria")
+      : (titles[location.pathname] ?? "Cadastro Local");
   return (
     <Box
       sx={{
