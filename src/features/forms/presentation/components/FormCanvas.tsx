@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -12,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddOutlined from "@mui/icons-material/AddOutlined";
-import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
 import ViewColumnOutlined from "@mui/icons-material/ViewColumnOutlined";
 import ImageOutlined from "@mui/icons-material/ImageOutlined";
 import type {
@@ -104,21 +109,17 @@ interface ColumnZoneProps {
   rowId: string;
   isSelected: boolean;
   onSelect: (id: string) => void;
-  onRemove: () => void;
 }
 
-function ColumnZone({
-  column,
-  rowId,
-  isSelected,
-  onSelect,
-  onRemove,
-}: ColumnZoneProps) {
+function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `col-${column.id}`,
     data: { target: "column", rowId, columnId: column.id },
   });
-
+  const updateComponent = useFormBuilderStore((s) => s.updateComponent);
+  const removeComponent = useFormBuilderStore((s) => s.removeComponent);
+  const [editOpen, setEditOpen] = useState(false);
+  const [draftLabel, setDraftLabel] = useState("");
   return (
     <Box
       ref={setNodeRef}
@@ -164,13 +165,13 @@ function ColumnZone({
           >
             <IconButton
               size="small"
-              color="error"
               onClick={(e) => {
                 e.stopPropagation();
-                onRemove();
+                setDraftLabel(column.component!.label);
+                setEditOpen(true);
               }}
             >
-              <DeleteOutline fontSize="small" />
+              <MoreVertOutlined fontSize="small" />
             </IconButton>
           </Box>
         </Box>
@@ -189,6 +190,60 @@ function ColumnZone({
           </Typography>
         </Box>
       )}
+
+      {/* Field edit modal */}
+      <Dialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Editar campo</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            size="small"
+            label="Nome do campo"
+            value={draftLabel}
+            onChange={(e) => setDraftLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && column.component) {
+                updateComponent(column.component.id, { label: draftLabel });
+                setEditOpen(false);
+              }
+            }}
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+          <Button
+            color="error"
+            size="small"
+            onClick={() => {
+              if (column.component) removeComponent(rowId, column.id);
+              setEditOpen(false);
+            }}
+          >
+            Remover campo
+          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button color="inherit" onClick={() => setEditOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (column.component)
+                  updateComponent(column.component.id, { label: draftLabel });
+                setEditOpen(false);
+              }}
+            >
+              Salvar
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
@@ -202,7 +257,6 @@ function RowCard({ row }: RowCardProps) {
   const setSelectedComponent = useFormBuilderStore(
     (s) => s.setSelectedComponent,
   );
-  const removeComponent = useFormBuilderStore((s) => s.removeComponent);
   const addColumn = useFormBuilderStore((s) => s.addColumn);
 
   return (
@@ -224,7 +278,6 @@ function RowCard({ row }: RowCardProps) {
             rowId={row.id}
             isSelected={col.component?.id === selectedComponentId}
             onSelect={setSelectedComponent}
-            onRemove={() => removeComponent(row.id, col.id)}
           />
         ))}
         {row.columns.length < 3 && (

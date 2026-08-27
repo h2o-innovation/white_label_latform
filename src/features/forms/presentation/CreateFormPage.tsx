@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -32,6 +32,12 @@ export function CreateFormPage() {
   const addCategory = useFormsStore((s) => s.addCategory);
   const setComponent = useFormBuilderStore((s) => s.setComponent);
   const selectedComponentId = useFormBuilderStore((s) => s.selectedComponentId);
+  const steps = useFormBuilderStore((s) => s.steps);
+  const reset = useFormBuilderStore((s) => s.reset);
+
+  useEffect(() => {
+    reset();
+  }, [reset]);
 
   const [namingOpen, setNamingOpen] = useState(false);
   const [formName, setFormName] = useState("");
@@ -56,7 +62,7 @@ export function CreateFormPage() {
 
   const handleConfirm = () => {
     if (!formName.trim()) return;
-    addCategory(formName.trim());
+    addCategory(formName.trim(), steps);
     setNamingOpen(false);
     navigate("/forms");
   };

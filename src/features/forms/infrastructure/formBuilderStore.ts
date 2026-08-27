@@ -85,6 +85,7 @@ interface FormBuilderStore {
   addEdge: (fromStepId: string, toStepId: string) => void;
   updateEdge: (id: string, patch: Partial<Omit<FlowEdge, "id">>) => void;
   removeEdge: (id: string) => void;
+  reset: () => void;
 }
 
 export const useFormBuilderStore = create<FormBuilderStore>((set, get) => {
@@ -198,5 +199,15 @@ export const useFormBuilderStore = create<FormBuilderStore>((set, get) => {
 
     removeEdge: (id) =>
       set((s) => ({ edges: s.edges.filter((e) => e.id !== id) })),
+
+    reset: () => {
+      const step = makeStep("Passo 1");
+      set({
+        steps: [step],
+        activeStepId: step.id,
+        selectedComponentId: null,
+        edges: [],
+      });
+    },
   };
 });
