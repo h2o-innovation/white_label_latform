@@ -21,10 +21,10 @@ export function FormsPage() {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: 3,
-            bgcolor: "grey.100",
+            bgcolor: "background.paper",
             border: "1px solid",
-            borderColor: "grey.200",
-            "&:hover": { bgcolor: "grey.200" },
+            borderColor: "divider",
+            "&:hover": { bgcolor: "action.hover" },
           }}
         >
           <Typography variant="subtitle1" fontWeight={600}>

@@ -33,7 +33,8 @@ export function Header() {
   return (
     <Box
       sx={{
-        borderBottom: "1px solid #e5ebe7",
+        borderBottom: "1px solid",
+        borderColor: "divider",
         bgcolor: "background.paper",
         width: "100%",
       }}

@@ -95,11 +95,11 @@ function DraggableItem({ type, label, icon }: PaletteEntry) {
         borderRadius: 1,
         cursor: "grab",
         border: "1px solid",
-        borderColor: isDragging ? "primary.main" : "grey.300",
+        borderColor: isDragging ? "primary.main" : "divider",
         bgcolor: isDragging ? "primary.50" : "background.paper",
         opacity: isDragging ? 0.4 : 1,
         userSelect: "none",
-        "&:hover": { bgcolor: "grey.50", borderColor: "grey.400" },
+        "&:hover": { bgcolor: "action.hover", borderColor: "text.disabled" },
       }}
     >
       {icon}
@@ -116,7 +116,7 @@ export function ComponentPalette() {
         flexShrink: 0,
         bgcolor: "background.paper",
         borderRight: "1px solid",
-        borderColor: "grey.200",
+        borderColor: "divider",
         overflowY: "auto",
         p: 2,
       }}

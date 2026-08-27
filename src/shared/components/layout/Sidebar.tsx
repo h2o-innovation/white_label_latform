@@ -5,19 +5,23 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Typography,
   Box,
 } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
 import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
+import logo from "../../../assets/logo.png";
+import logoDark from "../../../assets/logo_dark.png";
 import { NavLink, useLocation } from "react-router-dom";
+import { useThemeStore } from "../../stores/themeStore";
 
 const drawerWidth = 240;
 
 export function Sidebar() {
   const location = useLocation();
+  const mode = useThemeStore((s) => s.mode);
+  const logoSrc = mode === "dark" ? logoDark : logo;
   return (
     <Drawer
       variant="permanent"
@@ -27,23 +31,18 @@ export function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          borderRight: "1px solid #e5ebe7",
+          borderRight: "1px solid",
+          borderColor: "divider",
         },
       }}
     >
-      <Toolbar sx={{ px: 3 }}>
-        <Box>
-          <Typography
-            variant="h6"
-            color="primary.dark"
-            sx={{ lineHeight: 1.1 }}
-          >
-            Cadastro
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Gestão local
-          </Typography>
-        </Box>
+      <Toolbar sx={{ px: 3, justifyContent: "center" }}>
+        <Box
+          component="img"
+          src={logoSrc}
+          alt="Logo"
+          sx={{ maxWidth: "80%", maxHeight: 56, objectFit: "contain" }}
+        />
       </Toolbar>
       <List sx={{ px: 1.5, pt: 2 }}>
         <ListItemButton

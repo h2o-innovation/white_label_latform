@@ -79,7 +79,7 @@ export function PropertyEditor() {
         flexShrink: 0,
         bgcolor: "background.paper",
         borderLeft: "1px solid",
-        borderColor: "grey.200",
+        borderColor: "divider",
         overflowY: "auto",
         p: 2,
       }}

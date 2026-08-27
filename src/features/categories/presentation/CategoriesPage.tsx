@@ -67,7 +67,7 @@ export function CategoriesPage() {
     justifyContent: "center",
     borderRadius: 3,
     border: "1px solid",
-    borderColor: "grey.200",
+    borderColor: "divider",
   } as const;
 
   return (
@@ -80,9 +80,9 @@ export function CategoriesPage() {
             onClick={() => navigate(`/categories/${group.id}`)}
             sx={{
               ...blockSx,
-              bgcolor: "grey.100",
+              bgcolor: "background.paper",
               position: "relative",
-              "&:hover": { bgcolor: "grey.200" },
+              "&:hover": { bgcolor: "action.hover" },
               "&:hover .edit-btn": { opacity: 1 },
             }}
           >
