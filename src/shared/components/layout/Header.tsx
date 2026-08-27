@@ -6,6 +6,7 @@ import { useFormsStore } from "../../../features/forms/infrastructure/formsStore
 
 const titles: Record<string, string> = {
   "/clients": "Clientes",
+  "/categories": "Categorias",
   "/forms": "Formulários",
   "/forms/new": "Novo Formulário",
   "/settings": "Configurações",

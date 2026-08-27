@@ -9,6 +9,7 @@ import {
   Box,
 } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
+import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -47,13 +48,24 @@ export function Sidebar() {
         <ListItemButton
           component={NavLink}
           to="/forms"
-          selected={location.pathname === "/forms"}
+          selected={location.pathname.startsWith("/forms")}
           sx={{ borderRadius: 2, mb: 0.5 }}
         >
           <ListItemIcon>
             <AssignmentOutlined />
           </ListItemIcon>
           <ListItemText primary="Formulários" />
+        </ListItemButton>
+        <ListItemButton
+          component={NavLink}
+          to="/categories"
+          selected={location.pathname === "/categories"}
+          sx={{ borderRadius: 2, mb: 0.5 }}
+        >
+          <ListItemIcon>
+            <CategoryOutlined />
+          </ListItemIcon>
+          <ListItemText primary="Categorias" />
         </ListItemButton>
         <ListItemButton
           component={NavLink}

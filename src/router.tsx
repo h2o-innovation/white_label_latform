@@ -1,5 +1,6 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "./shared/components/layout/AppLayout";
+import { CategoriesPage } from "./features/categories/presentation/CategoriesPage";
 import { ClientsPage } from "./features/clients/presentation/ClientsPage";
 import { CreateFormPage } from "./features/forms/presentation/CreateFormPage";
 import { FormEntriesPage } from "./features/forms/presentation/FormEntriesPage";
@@ -11,8 +12,9 @@ export const router = createBrowserRouter([
     path: "/",
     element: <AppLayout />,
     children: [
-      { index: true, element: <Navigate to="/clients" replace /> },
+      { index: true, element: <Navigate to="/forms" replace /> },
       { path: "clients", element: <ClientsPage /> },
+      { path: "categories", element: <CategoriesPage /> },
       { path: "forms", element: <FormsPage /> },
       { path: "forms/new", element: <CreateFormPage /> },
       { path: "forms/:categoryId", element: <FormEntriesPage /> },
