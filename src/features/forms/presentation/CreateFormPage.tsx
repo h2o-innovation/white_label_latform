@@ -1,16 +1,40 @@
 import { useState } from 'react'
-import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  Paper, Stack, TextField, Typography,
-} from '@mui/material'
+import { DndContext, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useFormsStore } from '../infrastructure/formsStore'
+import { useFormBuilderStore, defaultLabel, type ComponentType } from '../infrastructure/formBuilderStore'
+import { ComponentPalette } from './components/ComponentPalette'
+import { FormCanvas } from './components/FormCanvas'
+import { FlowPanel } from './components/FlowPanel'
+import { PropertyEditor } from './components/PropertyEditor'
 
 export function CreateFormPage() {
   const navigate = useNavigate()
-  const addCategory = useFormsStore((state) => state.addCategory)
+  const addCategory = useFormsStore((s) => s.addCategory)
+  const setComponent = useFormBuilderStore((s) => s.setComponent)
+  const selectedComponentId = useFormBuilderStore((s) => s.selectedComponentId)
+
   const [namingOpen, setNamingOpen] = useState(false)
   const [formName, setFormName] = useState('')
+  const [draggingType, setDraggingType] = useState<ComponentType | null>(null)
+
+  const handleDragStart = (event: DragStartEvent) => {
+    if (event.active.data.current?.source === 'palette') {
+      setDraggingType(event.active.data.current.componentType)
+    }
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setDraggingType(null)
+    const { active, over } = event
+    if (!over) return
+    const src = active.data.current
+    const dst = over.data.current
+    if (src?.source === 'palette' && dst?.target === 'column') {
+      setComponent(dst.rowId, dst.columnId, src.componentType)
+    }
+  }
 
   const handleConfirm = () => {
     if (!formName.trim()) return
@@ -20,29 +44,34 @@ export function CreateFormPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 520, mx: 'auto', mt: 4 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h6" sx={{ mb: 3 }}>Dados do formulário</Typography>
-        <Stack spacing={3}>
-          <TextField fullWidth label="Nome" />
-          <TextField fullWidth label="Sobrenome" />
-          <TextField fullWidth label="Telefone" />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-            <Button color="inherit" onClick={() => navigate('/forms')}>Cancelar</Button>
-            <Button variant="contained" onClick={() => setNamingOpen(true)}>Salvar</Button>
-          </Box>
-        </Stack>
-      </Paper>
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      {/* Action bar */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, px: 2, py: 1, borderBottom: '1px solid', borderColor: 'grey.200', bgcolor: 'background.paper' }}>
+        <Button color="inherit" onClick={() => navigate('/forms')}>Cancelar</Button>
+        <Button variant="contained" onClick={() => setNamingOpen(true)}>Salvar formulário</Button>
+      </Box>
 
+      {/* 3-panel builder */}
+      <Box sx={{ display: 'flex', height: 'calc(100vh - 140px)', overflow: 'hidden' }}>
+        <ComponentPalette />
+        <FormCanvas />
+        {selectedComponentId ? <PropertyEditor /> : <FlowPanel />}
+      </Box>
+
+      {/* Drag ghost */}
+      <DragOverlay>
+        {draggingType && (
+          <Chip label={defaultLabel[draggingType]} size="small" color="primary" sx={{ cursor: 'grabbing' }} />
+        )}
+      </DragOverlay>
+
+      {/* Naming dialog */}
       <Dialog open={namingOpen} onClose={() => setNamingOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>Nome do formulário</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
-            fullWidth
-            label="Nome do formulário"
-            value={formName}
-            onChange={(e) => setFormName(e.target.value)}
+            autoFocus fullWidth label="Nome do formulário"
+            value={formName} onChange={(e) => setFormName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
             sx={{ mt: 1 }}
           />
@@ -52,6 +81,7 @@ export function CreateFormPage() {
           <Button variant="contained" onClick={handleConfirm} disabled={!formName.trim()}>Criar</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </DndContext>
   )
 }
+
