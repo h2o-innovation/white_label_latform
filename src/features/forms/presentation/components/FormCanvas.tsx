@@ -7,9 +7,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControl,
   IconButton,
   InputLabel,
+  List,
+  ListItem,
+  ListItemText,
   MenuItem,
   Select,
   TextField,
@@ -17,6 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddOutlined from "@mui/icons-material/AddOutlined";
+import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
 import ViewColumnOutlined from "@mui/icons-material/ViewColumnOutlined";
 import ImageOutlined from "@mui/icons-material/ImageOutlined";
@@ -120,6 +125,46 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const removeComponent = useFormBuilderStore((s) => s.removeComponent);
   const [editOpen, setEditOpen] = useState(false);
   const [draftLabel, setDraftLabel] = useState("");
+  const [draftOptions, setDraftOptions] = useState<
+    { id: string; label: string; value: string }[]
+  >([]);
+  const [addOptionOpen, setAddOptionOpen] = useState(false);
+  const [newOptionLabel, setNewOptionLabel] = useState("");
+
+  const isSelect =
+    column.component?.type === "select" ||
+    column.component?.type === "multiselect";
+
+  const openEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDraftLabel(column.component!.label);
+    setDraftOptions([...(column.component!.options ?? [])]);
+    setEditOpen(true);
+  };
+
+  const handleSave = () => {
+    if (column.component)
+      updateComponent(column.component.id, {
+        label: draftLabel,
+        options: draftOptions,
+      });
+    setEditOpen(false);
+  };
+
+  const handleAddOption = () => {
+    if (!newOptionLabel.trim()) return;
+    const label = newOptionLabel.trim();
+    setDraftOptions((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        label,
+        value: label.toLowerCase().replace(/\s+/g, "_"),
+      },
+    ]);
+    setNewOptionLabel("");
+    setAddOptionOpen(false);
+  };
   return (
     <Box
       ref={setNodeRef}
@@ -163,14 +208,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
               transition: "opacity 0.15s",
             }}
           >
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                setDraftLabel(column.component!.label);
-                setEditOpen(true);
-              }}
-            >
+            <IconButton size="small" onClick={openEdit}>
               <MoreVertOutlined fontSize="small" />
             </IconButton>
           </Box>
@@ -208,13 +246,56 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
             value={draftLabel}
             onChange={(e) => setDraftLabel(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && column.component) {
-                updateComponent(column.component.id, { label: draftLabel });
-                setEditOpen(false);
-              }
+              if (e.key === "Enter" && !isSelect) handleSave();
             }}
             sx={{ mt: 1 }}
           />
+          {isSelect && (
+            <>
+              <Divider sx={{ my: 2 }} />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 0.5 }}
+              >
+                Opções
+              </Typography>
+              <List dense disablePadding>
+                {draftOptions.map((opt) => (
+                  <ListItem
+                    key={opt.id}
+                    disableGutters
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        onClick={() =>
+                          setDraftOptions((p) =>
+                            p.filter((o) => o.id !== opt.id),
+                          )
+                        }
+                      >
+                        <DeleteOutline fontSize="small" />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText primary={opt.label} />
+                  </ListItem>
+                ))}
+              </List>
+              <Button
+                size="small"
+                startIcon={<AddOutlined />}
+                onClick={() => {
+                  setNewOptionLabel("");
+                  setAddOptionOpen(true);
+                }}
+                sx={{ mt: 0.5 }}
+              >
+                Adicionar opção
+              </Button>
+            </>
+          )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
           <Button
@@ -231,17 +312,44 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
             <Button color="inherit" onClick={() => setEditOpen(false)}>
               Cancelar
             </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                if (column.component)
-                  updateComponent(column.component.id, { label: draftLabel });
-                setEditOpen(false);
-              }}
-            >
+            <Button variant="contained" onClick={handleSave}>
               Salvar
             </Button>
           </Box>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add option nested modal */}
+      <Dialog
+        open={addOptionOpen}
+        onClose={() => setAddOptionOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Nova opção</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            size="small"
+            label="Nome da opção"
+            value={newOptionLabel}
+            onChange={(e) => setNewOptionLabel(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddOption()}
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" onClick={() => setAddOptionOpen(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleAddOption}
+            disabled={!newOptionLabel.trim()}
+          >
+            Adicionar
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
