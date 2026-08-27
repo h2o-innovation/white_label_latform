@@ -12,12 +12,16 @@ import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
 import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import logo from "../../../assets/logo.png";
+import logoDark from "../../../assets/logo_dark.png";
 import { NavLink, useLocation } from "react-router-dom";
+import { useThemeStore } from "../../stores/themeStore";
 
 const drawerWidth = 240;
 
 export function Sidebar() {
   const location = useLocation();
+  const mode = useThemeStore((s) => s.mode);
+  const logoSrc = mode === "dark" ? logoDark : logo;
   return (
     <Drawer
       variant="permanent"
@@ -34,7 +38,7 @@ export function Sidebar() {
       <Toolbar sx={{ px: 3, justifyContent: "center" }}>
         <Box
           component="img"
-          src={logo}
+          src={logoSrc}
           alt="Logo"
           sx={{ maxWidth: "80%", maxHeight: 56, objectFit: "contain" }}
         />
