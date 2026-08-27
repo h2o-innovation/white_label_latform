@@ -18,19 +18,26 @@ const titles: Record<string, string> = {
 export function Header() {
   const location = useLocation();
   const formsMatch = useMatch("/forms/:categoryId");
+  const formsEditMatch = useMatch("/forms/edit/:categoryId");
   const categoriesMatch = useMatch("/categories/:groupId");
   const formCategories = useFormsStore((s) => s.categories);
   const groups = useCategoriesStore((s) => s.groups);
   const openModal = useModalStore((state) => state.openModal);
   const isClientsPage = location.pathname === "/clients";
 
-  const title = formsMatch
-    ? (formCategories.find((c) => c.id === formsMatch.params.categoryId)
-        ?.name ?? "Formulário")
-    : categoriesMatch
-      ? (groups.find((g) => g.id === categoriesMatch.params.groupId)?.name ??
-        "Categoria")
-      : (titles[location.pathname] ?? "Cadastro Local");
+  const editedForm = formCategories.find(
+    (c) => c.id === formsEditMatch?.params.categoryId,
+  );
+
+  const title = formsEditMatch
+    ? `Editando: ${editedForm?.name ?? "Formulário"}`
+    : formsMatch
+      ? (formCategories.find((c) => c.id === formsMatch.params.categoryId)
+          ?.name ?? "Formulário")
+      : categoriesMatch
+        ? (groups.find((g) => g.id === categoriesMatch.params.groupId)?.name ??
+          "Categoria")
+        : (titles[location.pathname] ?? "Cadastro Local");
   return (
     <Box
       sx={{
