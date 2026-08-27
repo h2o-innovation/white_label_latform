@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Snackbar, Step, StepLabel, Stepper, Typography } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Snackbar, Stack, Step, StepLabel, Stepper, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { clientSchema } from '../domain/clientSchema'
 import type { ClientEntry, ClientFormData } from '../domain/types'
@@ -31,11 +31,15 @@ const emptyForm: ClientFormData = {
 interface ClientFormModalProps {
   editTarget: ClientEntry | null
   onClosed: () => void
+  viewOnly?: boolean
+  externalOpen?: boolean
+  onExternalClose?: () => void
 }
 
-export function ClientFormModal({ editTarget, onClosed }: ClientFormModalProps) {
+export function ClientFormModal({ editTarget, onClosed, viewOnly, externalOpen, onExternalClose }: ClientFormModalProps) {
   const open = useModalStore((state) => state.open)
   const closeModal = useModalStore((state) => state.closeModal)
+  const isOpen = externalOpen !== undefined ? externalOpen : open
   const addClient = useClientsStore((state) => state.addClient)
   const updateClientStore = useClientsStore((state) => state.updateClient)
   const [currentStep, setCurrentStep] = useState(0)
@@ -46,12 +50,15 @@ export function ClientFormModal({ editTarget, onClosed }: ClientFormModalProps) 
   })
 
   useEffect(() => {
-    if (!open) return
+    if (!isOpen) return
     setCurrentStep(0)
     reset(editTarget ?? emptyForm)
-  }, [editTarget, open, reset])
+  }, [editTarget, isOpen, reset])
 
-  const handleClose = () => { closeModal(); onClosed() }
+  const handleClose = () => {
+    if (onExternalClose) { onExternalClose(); onClosed(); return }
+    closeModal(); onClosed()
+  }
   const handleTypeChange = (type: ClientFormData['tipoCadastro']) => setPendingType(type)
   const confirmTypeChange = () => {
     if (pendingType) reset({ ...emptyForm, tipoCadastro: pendingType })
@@ -73,29 +80,41 @@ export function ClientFormModal({ editTarget, onClosed }: ClientFormModalProps) 
     handleClose()
   }
 
-  const step = [
-    <Step1BasicData key="basic" control={control} register={register} errors={errors} watch={watch} setValue={setValue} onTypeChange={handleTypeChange} />,
-    <Step2Location key="location" control={control} register={register} errors={errors} watch={watch} setValue={setValue} />,
-    <Step3Contacts key="contacts" control={control} register={register} errors={errors} watch={watch} setValue={setValue} />,
-    <Step4Documents key="documents" control={control} register={register} errors={errors} watch={watch} setValue={setValue} />,
-  ][currentStep]
+  const allSteps = [
+    <Step1BasicData key="basic" control={control} register={register} errors={errors} watch={watch} setValue={setValue} onTypeChange={handleTypeChange} readOnly={viewOnly} />,
+    <Step2Location key="location" control={control} register={register} errors={errors} watch={watch} setValue={setValue} readOnly={viewOnly} />,
+    <Step3Contacts key="contacts" control={control} register={register} errors={errors} watch={watch} setValue={setValue} readOnly={viewOnly} />,
+    <Step4Documents key="documents" control={control} register={register} errors={errors} watch={watch} setValue={setValue} readOnly={viewOnly} />,
+  ]
+  const step = allSteps[currentStep]
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-        <DialogTitle>{editTarget ? 'Editar cadastro' : 'Novo cadastro'}</DialogTitle>
+      <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
+        <DialogTitle>{viewOnly ? 'Visualizar cadastro' : editTarget ? 'Editar cadastro' : 'Novo cadastro'}</DialogTitle>
         <Divider />
         <DialogContent sx={{ pt: 3 }}>
-          <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 4 }}>
-            {steps.map((label) => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
-          </Stepper>
-          {step}
-          {Object.keys(errors).length > 0 && currentStep === 3 && <Typography color="error" variant="caption" sx={{ display: 'block', mt: 2 }}>Revise os campos obrigatórios antes de salvar.</Typography>}
+          {!viewOnly && (
+            <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 4 }}>
+              {steps.map((label) => <Step key={label}><StepLabel>{label}</StepLabel></Step>)}
+            </Stepper>
+          )}
+          {viewOnly ? (
+            <Stack spacing={3} divider={<Divider />}>{allSteps}</Stack>
+          ) : (
+            <>{step}{Object.keys(errors).length > 0 && currentStep === 3 && <Typography color="error" variant="caption" sx={{ display: 'block', mt: 2 }}>Revise os campos obrigatórios antes de salvar.</Typography>}</>
+          )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} color="inherit">Cancelar</Button>
-          {currentStep > 0 && <Button onClick={() => setCurrentStep((value) => value - 1)}>Voltar</Button>}
-          {currentStep < steps.length - 1 ? <Button variant="contained" onClick={handleNext}>Próximo</Button> : <Button variant="contained" onClick={handleSubmit(onSubmit)}>Salvar</Button>}
+          {viewOnly ? (
+            <Button onClick={handleClose} color="inherit">Fechar</Button>
+          ) : (
+            <>
+              <Button onClick={handleClose} color="inherit">Cancelar</Button>
+              {currentStep > 0 && <Button onClick={() => setCurrentStep((value) => value - 1)}>Voltar</Button>}
+              {currentStep < steps.length - 1 ? <Button variant="contained" onClick={handleNext}>Próximo</Button> : <Button variant="contained" onClick={handleSubmit(onSubmit)}>Salvar</Button>}
+            </>
+          )}
         </DialogActions>
       </Dialog>
       <Dialog open={pendingType !== null} onClose={() => setPendingType(null)} maxWidth="xs">

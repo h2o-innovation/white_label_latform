@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Typography } from '@mui/material'
 import DeleteOutline from '@mui/icons-material/DeleteOutline'
 import EditOutlined from '@mui/icons-material/EditOutlined'
+import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined'
 import { MaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { useClientsStore } from '../infrastructure/clientsStore'
 import { deleteClient } from '../application/deleteClient'
@@ -18,6 +19,7 @@ export function ClientsPage() {
   const removeClient = useClientsStore((state) => state.removeClient)
   const openModal = useModalStore((state) => state.openModal)
   const [editTarget, setEditTarget] = useState<ClientEntry | null>(null)
+  const [viewTarget, setViewTarget] = useState<ClientEntry | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ClientEntry | null>(null)
   const columns = useMemo<MRT_ColumnDef<ClientEntry>[]>(() => [
     { accessorKey: 'tipoCadastro', header: 'Tipo', Cell: ({ cell }) => typeLabels[cell.getValue<ClientEntry['tipoCadastro']>()] },
@@ -43,12 +45,13 @@ export function ClientsPage() {
           enableRowActions
           positionActionsColumn="last"
           getRowId={(row) => row.id}
-          renderRowActions={({ row }) => <Stack direction="row"><Button size="small" aria-label="Editar" onClick={() => { setEditTarget(row.original); openModal() }}><EditOutlined /></Button><Button color="error" size="small" aria-label="Excluir" onClick={() => setDeleteTarget(row.original)}><DeleteOutline /></Button></Stack>}
+          renderRowActions={({ row }) => <Stack direction="row"><Button size="small" aria-label="Visualizar" onClick={() => setViewTarget(row.original)}><VisibilityOutlined /></Button><Button size="small" aria-label="Editar" onClick={() => { setEditTarget(row.original); openModal() }}><EditOutlined /></Button><Button color="error" size="small" aria-label="Excluir" onClick={() => setDeleteTarget(row.original)}><DeleteOutline /></Button></Stack>}
           muiTablePaperProps={{ elevation: 0 }}
           muiTableContainerProps={{ sx: { maxHeight: 560 } }}
         />
       </Paper>
       <ClientFormModal editTarget={editTarget} onClosed={closeForm} />
+      <ClientFormModal viewOnly editTarget={viewTarget} onClosed={() => setViewTarget(null)} externalOpen={viewTarget !== null} onExternalClose={() => setViewTarget(null)} />
       <Dialog open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} maxWidth="xs">
         <DialogTitle>Excluir cadastro?</DialogTitle>
         <DialogContent>Essa ação removerá o cadastro localmente e não pode ser desfeita.</DialogContent>
