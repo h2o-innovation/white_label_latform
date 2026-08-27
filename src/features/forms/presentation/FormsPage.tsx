@@ -1,17 +1,18 @@
 import { Box, ButtonBase, Paper, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
-
-const categories = ["Clientes", "Ventas", "Crédito", "Granos"];
+import { useFormsStore } from "../infrastructure/formsStore";
 
 export function FormsPage() {
+  const categories = useFormsStore((state) => state.categories);
   const navigate = useNavigate();
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 1 }}>
-      {categories.map((name) => (
+      {categories.map((cat) => (
         <Paper
-          key={name}
+          key={cat.id}
           component={ButtonBase}
+          onClick={() => navigate(cat.route ?? `/forms/${cat.id}`)}
           sx={{
             width: 160,
             height: 160,
@@ -27,7 +28,7 @@ export function FormsPage() {
           }}
         >
           <Typography variant="subtitle1" fontWeight={600}>
-            {name}
+            {cat.name}
           </Typography>
         </Paper>
       ))}
