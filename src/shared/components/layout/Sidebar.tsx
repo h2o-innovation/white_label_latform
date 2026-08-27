@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
+import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -66,6 +67,17 @@ export function Sidebar() {
             <CategoryOutlined />
           </ListItemIcon>
           <ListItemText primary="Categorias" />
+        </ListItemButton>
+        <ListItemButton
+          component={NavLink}
+          to="/users"
+          selected={location.pathname === "/users"}
+          sx={{ borderRadius: 2, mb: 0.5 }}
+        >
+          <ListItemIcon>
+            <PeopleAltOutlined />
+          </ListItemIcon>
+          <ListItemText primary="Usuários" />
         </ListItemButton>
         <ListItemButton
           component={NavLink}

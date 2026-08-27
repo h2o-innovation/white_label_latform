@@ -23,7 +23,9 @@ export const useCategoriesStore = create<CategoriesStore>()(
         })),
       updateGroup: (id, name, formIds) =>
         set((s) => ({
-          groups: s.groups.map((g) => (g.id === id ? { ...g, name, formIds } : g)),
+          groups: s.groups.map((g) =>
+            g.id === id ? { ...g, name, formIds } : g,
+          ),
         })),
     }),
     { name: "categories-store" },

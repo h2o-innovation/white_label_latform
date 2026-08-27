@@ -10,6 +10,7 @@ const titles: Record<string, string> = {
   "/categories": "Categorias",
   "/forms": "Formulários",
   "/forms/new": "Novo Formulário",
+  "/users": "Usuários",
   "/settings": "Configurações",
 };
 

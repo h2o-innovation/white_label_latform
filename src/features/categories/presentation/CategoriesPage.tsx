@@ -31,13 +31,18 @@ export function CategoriesPage() {
   const allForms = useFormsStore((s) => s.categories.filter((c) => !c.route));
 
   const [open, setOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<typeof groups[0] | null>(null);
+  const [editTarget, setEditTarget] = useState<(typeof groups)[0] | null>(null);
   const [name, setName] = useState("");
   const [selectedForms, setSelectedForms] = useState<FormCategory[]>([]);
 
-  const openCreate = () => { setEditTarget(null); setName(""); setSelectedForms([]); setOpen(true); };
+  const openCreate = () => {
+    setEditTarget(null);
+    setName("");
+    setSelectedForms([]);
+    setOpen(true);
+  };
 
-  const openEdit = (e: React.MouseEvent, group: typeof groups[0]) => {
+  const openEdit = (e: React.MouseEvent, group: (typeof groups)[0]) => {
     e.stopPropagation();
     setEditTarget(group);
     setName(group.name);
@@ -92,7 +97,13 @@ export function CategoriesPage() {
               className="edit-btn"
               size="small"
               onClick={(e) => openEdit(e, group)}
-              sx={{ position: "absolute", top: 6, right: 6, opacity: 0, transition: "opacity 0.15s" }}
+              sx={{
+                position: "absolute",
+                top: 6,
+                right: 6,
+                opacity: 0,
+                transition: "opacity 0.15s",
+              }}
             >
               <EditOutlined fontSize="small" />
             </IconButton>
@@ -118,7 +129,9 @@ export function CategoriesPage() {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>{editTarget ? "Editar categoria" : "Nova categoria"}</DialogTitle>
+        <DialogTitle>
+          {editTarget ? "Editar categoria" : "Nova categoria"}
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -150,7 +163,11 @@ export function CategoriesPage() {
           <Button color="inherit" onClick={() => setOpen(false)}>
             Cancelar
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={!name.trim()}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!name.trim()}
+          >
             {editTarget ? "Salvar" : "Criar"}
           </Button>
         </DialogActions>
