@@ -28,7 +28,7 @@ export function FlowPanel() {
         flexShrink: 0,
         bgcolor: "background.paper",
         borderLeft: "1px solid",
-        borderColor: "grey.200",
+        borderColor: "divider",
         overflowY: "auto",
         p: 2,
       }}
@@ -59,7 +59,7 @@ export function FlowPanel() {
                 p: 1.5,
                 mb: 0.5,
                 cursor: "pointer",
-                borderColor: isActive ? "primary.main" : "grey.200",
+                borderColor: isActive ? "primary.main" : "divider",
                 bgcolor: isActive ? "primary.50" : "background.paper",
                 "&:hover": { borderColor: "primary.light" },
               }}

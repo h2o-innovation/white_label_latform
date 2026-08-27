@@ -86,7 +86,7 @@ function ComponentPreview({ component }: { component: FormComponent }) {
         <Box
           sx={{
             border: "1px dashed",
-            borderColor: "grey.400",
+            borderColor: "text.disabled",
             borderRadius: 1,
             p: 2,
             textAlign: "center",
@@ -179,7 +179,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
           ? "primary.main"
           : column.component
             ? "transparent"
-            : "grey.300",
+            : "divider",
         bgcolor: isOver ? "primary.50" : "transparent",
         transition: "border-color 0.15s, background-color 0.15s",
       }}
@@ -373,9 +373,9 @@ function RowCard({ row }: RowCardProps) {
         mb: 1.5,
         p: 1,
         border: "1px solid",
-        borderColor: "grey.200",
+        borderColor: "divider",
         borderRadius: 2,
-        bgcolor: "grey.50",
+        bgcolor: "background.paper",
       }}
     >
       <Box sx={{ display: "flex", gap: 1, alignItems: "stretch" }}>
@@ -436,7 +436,7 @@ export function FormCanvas() {
           pt: 2,
           pb: 1,
           borderBottom: "1px solid",
-          borderColor: "grey.200",
+          borderColor: "divider",
           overflowX: "auto",
         }}
       >

@@ -78,7 +78,7 @@ export function CreateFormPage() {
           px: 2,
           py: 1,
           borderBottom: "1px solid",
-          borderColor: "grey.200",
+          borderColor: "divider",
           bgcolor: "background.paper",
         }}
       >

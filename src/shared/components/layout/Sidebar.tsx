@@ -31,7 +31,8 @@ export function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          borderRight: "1px solid #e5ebe7",
+          borderRight: "1px solid",
+          borderColor: "divider",
         },
       }}
     >
