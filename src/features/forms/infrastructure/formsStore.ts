@@ -12,12 +12,13 @@ export interface FormCategory {
 interface FormsStore {
   categories: FormCategory[];
   addCategory: (name: string, steps?: FormStep[]) => void;
+  removeCategory: (id: string) => void;
 }
 
 export const useFormsStore = create<FormsStore>()(
   persist(
     (set) => ({
-      categories: [{ id: "clientes", name: "Clientes", route: "/clients" }],
+      categories: [],
       addCategory: (name, steps) =>
         set((state) => ({
           categories: [
@@ -25,7 +26,9 @@ export const useFormsStore = create<FormsStore>()(
             { id: name.toLowerCase().replace(/\s+/g, "-"), name, steps },
           ],
         })),
+      removeCategory: (id) =>
+        set((s) => ({ categories: s.categories.filter((c) => c.id !== id) })),
     }),
-    { name: "forms-store" },
+    { name: "forms-store-v2" },
   ),
 );
