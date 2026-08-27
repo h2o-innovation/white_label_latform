@@ -15,6 +15,7 @@ import logo from "../../../assets/logo.png";
 import logoDark from "../../../assets/logo_dark.png";
 import { NavLink, useLocation } from "react-router-dom";
 import { useThemeStore } from "../../stores/themeStore";
+import { useAuthStore } from "../../stores/authStore";
 
 const drawerWidth = 240;
 
@@ -22,6 +23,7 @@ export function Sidebar() {
   const location = useLocation();
   const mode = useThemeStore((s) => s.mode);
   const logoSrc = mode === "dark" ? logoDark : logo;
+  const isAdmin = useAuthStore((s) => s.currentUser?.role === "admin");
   return (
     <Drawer
       variant="permanent"
@@ -56,28 +58,32 @@ export function Sidebar() {
           </ListItemIcon>
           <ListItemText primary="Formulários" />
         </ListItemButton>
-        <ListItemButton
-          component={NavLink}
-          to="/categories"
-          selected={location.pathname === "/categories"}
-          sx={{ borderRadius: 2, mb: 0.5 }}
-        >
-          <ListItemIcon>
-            <CategoryOutlined />
-          </ListItemIcon>
-          <ListItemText primary="Categorias" />
-        </ListItemButton>
-        <ListItemButton
-          component={NavLink}
-          to="/users"
-          selected={location.pathname === "/users"}
-          sx={{ borderRadius: 2, mb: 0.5 }}
-        >
-          <ListItemIcon>
-            <PeopleAltOutlined />
-          </ListItemIcon>
-          <ListItemText primary="Usuários" />
-        </ListItemButton>
+        {isAdmin && (
+          <ListItemButton
+            component={NavLink}
+            to="/categories"
+            selected={location.pathname === "/categories"}
+            sx={{ borderRadius: 2, mb: 0.5 }}
+          >
+            <ListItemIcon>
+              <CategoryOutlined />
+            </ListItemIcon>
+            <ListItemText primary="Categorias" />
+          </ListItemButton>
+        )}
+        {isAdmin && (
+          <ListItemButton
+            component={NavLink}
+            to="/users"
+            selected={location.pathname === "/users"}
+            sx={{ borderRadius: 2, mb: 0.5 }}
+          >
+            <ListItemIcon>
+              <PeopleAltOutlined />
+            </ListItemIcon>
+            <ListItemText primary="Usuários" />
+          </ListItemButton>
+        )}
         <ListItemButton
           component={NavLink}
           to="/settings"
