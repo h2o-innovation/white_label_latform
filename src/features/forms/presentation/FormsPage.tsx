@@ -16,13 +16,24 @@ import AddIcon from "@mui/icons-material/Add";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { useNavigate } from "react-router-dom";
 import { useFormsStore, type FormCategory } from "../infrastructure/formsStore";
+import { useAuthStore } from "../../../shared/stores/authStore";
+import { usePermissionsStore } from "../../categories/infrastructure/permissionsStore";
 
 export function FormsPage() {
-  const categories = useFormsStore((state) => state.categories);
+  const allCategories = useFormsStore((state) => state.categories);
   const renameCategory = useFormsStore((s) => s.renameCategory);
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const getUserIds = usePermissionsStore((s) => s.getUserIds);
   const navigate = useNavigate();
   const [editTarget, setEditTarget] = useState<FormCategory | null>(null);
   const [draftName, setDraftName] = useState("");
+
+  const isAdmin = currentUser?.role === "admin";
+  const categories = isAdmin
+    ? allCategories
+    : allCategories.filter((cat) =>
+        getUserIds(cat.id).includes(currentUser?.id ?? ""),
+      );
 
   const openEdit = (e: React.MouseEvent, cat: FormCategory) => {
     e.stopPropagation();
@@ -62,40 +73,44 @@ export function FormsPage() {
             <Typography variant="subtitle1" fontWeight={600}>
               {cat.name}
             </Typography>
-            <IconButton
-              className="edit-btn"
-              size="small"
-              onClick={(e) => openEdit(e, cat)}
-              sx={{
-                position: "absolute",
-                top: 6,
-                right: 6,
-                opacity: 0,
-                transition: "opacity 0.15s",
-              }}
-            >
-              <EditOutlined fontSize="small" />
-            </IconButton>
+            {isAdmin && (
+              <IconButton
+                className="edit-btn"
+                size="small"
+                onClick={(e) => openEdit(e, cat)}
+                sx={{
+                  position: "absolute",
+                  top: 6,
+                  right: 6,
+                  opacity: 0,
+                  transition: "opacity 0.15s",
+                }}
+              >
+                <EditOutlined fontSize="small" />
+              </IconButton>
+            )}
           </Paper>
         ))}
-        <Paper
-          component={ButtonBase}
-          onClick={() => navigate("/forms/new")}
-          sx={{
-            width: 160,
-            height: 160,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 3,
-            bgcolor: "primary.main",
-            border: "none",
-            "&:hover": { bgcolor: "primary.dark" },
-          }}
-        >
-          <AddIcon sx={{ fontSize: 40, color: "white" }} />
-        </Paper>
+        {isAdmin && (
+          <Paper
+            component={ButtonBase}
+            onClick={() => navigate("/forms/new")}
+            sx={{
+              width: 160,
+              height: 160,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 3,
+              bgcolor: "primary.main",
+              border: "none",
+              "&:hover": { bgcolor: "primary.dark" },
+            }}
+          >
+            <AddIcon sx={{ fontSize: 40, color: "white" }} />
+          </Paper>
+        )}
       </Box>
 
       <Dialog
