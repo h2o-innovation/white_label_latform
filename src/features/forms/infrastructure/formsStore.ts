@@ -12,6 +12,8 @@ export interface FormCategory {
 interface FormsStore {
   categories: FormCategory[];
   addCategory: (name: string, steps?: FormStep[]) => void;
+  renameCategory: (id: string, name: string) => void;
+  updateCategory: (id: string, name: string, steps: FormStep[]) => void;
   removeCategory: (id: string) => void;
 }
 
@@ -25,6 +27,18 @@ export const useFormsStore = create<FormsStore>()(
             ...state.categories,
             { id: name.toLowerCase().replace(/\s+/g, "-"), name, steps },
           ],
+        })),
+      renameCategory: (id, name) =>
+        set((s) => ({
+          categories: s.categories.map((c) =>
+            c.id === id ? { ...c, name } : c,
+          ),
+        })),
+      updateCategory: (id, name, steps) =>
+        set((s) => ({
+          categories: s.categories.map((c) =>
+            c.id === id ? { ...c, name, steps } : c,
+          ),
         })),
       removeCategory: (id) =>
         set((s) => ({ categories: s.categories.filter((c) => c.id !== id) })),

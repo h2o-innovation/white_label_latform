@@ -1,18 +1,86 @@
-import { Box, ButtonBase, Paper, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  ButtonBase,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import EditOutlined from "@mui/icons-material/EditOutlined";
 import { useNavigate } from "react-router-dom";
-import { useFormsStore } from "../infrastructure/formsStore";
+import { useFormsStore, type FormCategory } from "../infrastructure/formsStore";
 
 export function FormsPage() {
   const categories = useFormsStore((state) => state.categories);
+  const renameCategory = useFormsStore((s) => s.renameCategory);
   const navigate = useNavigate();
+  const [editTarget, setEditTarget] = useState<FormCategory | null>(null);
+  const [draftName, setDraftName] = useState("");
+
+  const openEdit = (e: React.MouseEvent, cat: FormCategory) => {
+    e.stopPropagation();
+    navigate(`/forms/edit/${cat.id}`);
+  };
+
+  const handleSave = () => {
+    if (editTarget && draftName.trim())
+      renameCategory(editTarget.id, draftName.trim());
+    setEditTarget(null);
+  };
+
   return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 1 }}>
-      {categories.map((cat) => (
+    <>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 1 }}>
+        {categories.map((cat) => (
+          <Paper
+            key={cat.id}
+            component={ButtonBase}
+            onClick={() => navigate(cat.route ?? `/forms/${cat.id}`)}
+            sx={{
+              width: 160,
+              height: 160,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 3,
+              bgcolor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              position: "relative",
+              "&:hover": { bgcolor: "action.hover" },
+              "&:hover .edit-btn": { opacity: 1 },
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600}>
+              {cat.name}
+            </Typography>
+            <IconButton
+              className="edit-btn"
+              size="small"
+              onClick={(e) => openEdit(e, cat)}
+              sx={{
+                position: "absolute",
+                top: 6,
+                right: 6,
+                opacity: 0,
+                transition: "opacity 0.15s",
+              }}
+            >
+              <EditOutlined fontSize="small" />
+            </IconButton>
+          </Paper>
+        ))}
         <Paper
-          key={cat.id}
           component={ButtonBase}
-          onClick={() => navigate(cat.route ?? `/forms/${cat.id}`)}
+          onClick={() => navigate("/forms/new")}
           sx={{
             width: 160,
             height: 160,
@@ -21,35 +89,46 @@ export function FormsPage() {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: 3,
-            bgcolor: "background.paper",
-            border: "1px solid",
-            borderColor: "divider",
-            "&:hover": { bgcolor: "action.hover" },
+            bgcolor: "primary.main",
+            border: "none",
+            "&:hover": { bgcolor: "primary.dark" },
           }}
         >
-          <Typography variant="subtitle1" fontWeight={600}>
-            {cat.name}
-          </Typography>
+          <AddIcon sx={{ fontSize: 40, color: "white" }} />
         </Paper>
-      ))}
-      <Paper
-        component={ButtonBase}
-        onClick={() => navigate("/forms/new")}
-        sx={{
-          width: 160,
-          height: 160,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: 3,
-          bgcolor: "primary.main",
-          border: "none",
-          "&:hover": { bgcolor: "primary.dark" },
-        }}
+      </Box>
+
+      <Dialog
+        open={editTarget !== null}
+        onClose={() => setEditTarget(null)}
+        maxWidth="xs"
+        fullWidth
       >
-        <AddIcon sx={{ fontSize: 40, color: "white" }} />
-      </Paper>
-    </Box>
+        <DialogTitle>Editar formulário</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Nome do formulário"
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSave()}
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" onClick={() => setEditTarget(null)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!draftName.trim()}
+          >
+            Salvar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

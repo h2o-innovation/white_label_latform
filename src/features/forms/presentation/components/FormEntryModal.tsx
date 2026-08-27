@@ -22,18 +22,26 @@ import type {
   FormComponent,
   FormStep,
 } from "../../infrastructure/formBuilderStore";
-import type { EntryData } from "../../infrastructure/formEntriesStore";
+import type {
+  EntryData,
+  FormEntry,
+} from "../../infrastructure/formEntriesStore";
+import { useFormEntriesStore } from "../../infrastructure/formEntriesStore";
+
+type ResolvedOption = { id: string; label: string; value: string };
 
 function DynamicField({
   component,
   register,
   control,
   disabled,
+  resolvedOptions,
 }: {
   component: FormComponent;
   register: ReturnType<typeof useForm>["register"];
   control: ReturnType<typeof useForm>["control"];
   disabled: boolean;
+  resolvedOptions: ResolvedOption[];
 }) {
   switch (component.type) {
     case "text":
@@ -82,7 +90,7 @@ function DynamicField({
             <FormControl fullWidth size="small" disabled={disabled}>
               <InputLabel>{component.label}</InputLabel>
               <Select {...field} label={component.label}>
-                {component.options.map((o) => (
+                {resolvedOptions.map((o) => (
                   <MenuItem key={o.id} value={o.value}>
                     {o.label}
                   </MenuItem>
@@ -102,7 +110,7 @@ function DynamicField({
             <FormControl fullWidth size="small" disabled={disabled}>
               <InputLabel>{component.label}</InputLabel>
               <Select {...field} multiple label={component.label}>
-                {component.options.map((o) => (
+                {resolvedOptions.map((o) => (
                   <MenuItem key={o.id} value={o.value}>
                     {o.label}
                   </MenuItem>
@@ -128,6 +136,19 @@ function StepFields({
   control: ReturnType<typeof useForm>["control"];
   disabled: boolean;
 }) {
+  const allEntries = useFormEntriesStore((s) => s.entries);
+
+  const resolveOptions = (comp: FormComponent): ResolvedOption[] => {
+    if (comp.dataSourceFormId && comp.dataSourceFieldId) {
+      const entries: FormEntry[] = allEntries[comp.dataSourceFormId] ?? [];
+      const seen = new Set<string>();
+      return entries
+        .map((e) => String(e.data[comp.dataSourceFieldId!] ?? "").trim())
+        .filter((v) => v && !seen.has(v) && seen.add(v))
+        .map((v) => ({ id: v, label: v, value: v }));
+    }
+    return comp.options;
+  };
   const rows = step.rows
     .map((row) => ({
       id: row.id,
@@ -158,6 +179,7 @@ function StepFields({
                 register={register}
                 control={control}
                 disabled={disabled}
+                resolvedOptions={resolveOptions(f)}
               />
             </Box>
           ))}

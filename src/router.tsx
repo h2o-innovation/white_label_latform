@@ -21,6 +21,7 @@ export const router = createBrowserRouter([
       { path: "users", element: <UsersPage /> },
       { path: "forms", element: <FormsPage /> },
       { path: "forms/new", element: <CreateFormPage /> },
+      { path: "forms/edit/:categoryId", element: <CreateFormPage /> },
       { path: "forms/:categoryId", element: <FormEntriesPage /> },
       { path: "settings", element: <SettingsPage /> },
     ],

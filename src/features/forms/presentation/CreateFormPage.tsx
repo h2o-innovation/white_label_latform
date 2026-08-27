@@ -15,7 +15,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFormsStore } from "../infrastructure/formsStore";
 import {
   useFormBuilderStore,
@@ -29,19 +29,41 @@ import { PropertyEditor } from "./components/PropertyEditor";
 
 export function CreateFormPage() {
   const navigate = useNavigate();
+  const { categoryId } = useParams<{ categoryId: string }>();
+  const isEdit = !!categoryId;
+
   const addCategory = useFormsStore((s) => s.addCategory);
+  const updateCategory = useFormsStore((s) => s.updateCategory);
+  const existingCategory = useFormsStore((s) =>
+    s.categories.find((c) => c.id === categoryId),
+  );
+
   const setComponent = useFormBuilderStore((s) => s.setComponent);
   const selectedComponentId = useFormBuilderStore((s) => s.selectedComponentId);
   const steps = useFormBuilderStore((s) => s.steps);
   const reset = useFormBuilderStore((s) => s.reset);
+  const loadSteps = useFormBuilderStore((s) => s.loadSteps);
 
   useEffect(() => {
-    reset();
-  }, [reset]);
+    if (isEdit && existingCategory?.steps?.length) {
+      loadSteps(existingCategory.steps);
+    } else {
+      reset();
+    }
+  }, [categoryId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [namingOpen, setNamingOpen] = useState(false);
-  const [formName, setFormName] = useState("");
+  const [formName, setFormName] = useState(existingCategory?.name ?? "");
   const [draggingType, setDraggingType] = useState<ComponentType | null>(null);
+
+  const handleSaveClick = () => {
+    if (isEdit) {
+      updateCategory(categoryId!, existingCategory?.name ?? "", steps);
+      navigate("/forms");
+    } else {
+      setNamingOpen(true);
+    }
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     if (event.active.data.current?.source === "palette") {
@@ -85,7 +107,10 @@ export function CreateFormPage() {
         <Button color="inherit" onClick={() => navigate("/forms")}>
           Cancelar
         </Button>
-        <Button variant="contained" onClick={() => setNamingOpen(true)}>
+        <Button
+          variant="contained"
+          onClick={isEdit ? handleSaveClick : () => setNamingOpen(true)}
+        >
           Salvar formulário
         </Button>
       </Box>
