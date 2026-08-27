@@ -29,8 +29,10 @@ import type {
   FormColumn,
   FormComponent,
   FormRow,
+  SelectOption,
 } from "../../infrastructure/formBuilderStore";
 import { useFormBuilderStore } from "../../infrastructure/formBuilderStore";
+import { useFormsStore } from "../../infrastructure/formsStore";
 
 function ComponentPreview({ component }: { component: FormComponent }) {
   switch (component.type) {
@@ -125,11 +127,39 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const removeComponent = useFormBuilderStore((s) => s.removeComponent);
   const [editOpen, setEditOpen] = useState(false);
   const [draftLabel, setDraftLabel] = useState("");
-  const [draftOptions, setDraftOptions] = useState<
-    { id: string; label: string; value: string }[]
-  >([]);
+  const [draftOptions, setDraftOptions] = useState<SelectOption[]>([]);
+  const [draftDataSourceFormId, setDraftDataSourceFormId] = useState("");
+  const [draftDataSourceFieldId, setDraftDataSourceFieldId] = useState("");
   const [addOptionOpen, setAddOptionOpen] = useState(false);
   const [newOptionLabel, setNewOptionLabel] = useState("");
+  const [newOptionFormId, setNewOptionFormId] = useState("");
+  const [newOptionFieldId, setNewOptionFieldId] = useState("");
+
+  const allForms = useFormsStore((s) => s.categories.filter((c) => !c.route));
+  const dataSourceFormSteps =
+    allForms.find((f) => f.id === draftDataSourceFormId)?.steps ?? [];
+  const dataSourceFields = dataSourceFormSteps.flatMap((step) =>
+    step.rows.flatMap((row) =>
+      row.columns
+        .map((c) => c.component)
+        .filter(
+          (c): c is FormComponent =>
+            c !== null && c.type !== "image" && c.type !== "button",
+        ),
+    ),
+  );
+  const linkedFormSteps =
+    allForms.find((f) => f.id === newOptionFormId)?.steps ?? [];
+  const linkedFormFields = linkedFormSteps.flatMap((step) =>
+    step.rows.flatMap((row) =>
+      row.columns
+        .map((c) => c.component)
+        .filter(
+          (c): c is FormComponent =>
+            c !== null && c.type !== "image" && c.type !== "button",
+        ),
+    ),
+  );
 
   const isSelect =
     column.component?.type === "select" ||
@@ -139,6 +169,8 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
     e.stopPropagation();
     setDraftLabel(column.component!.label);
     setDraftOptions([...(column.component!.options ?? [])]);
+    setDraftDataSourceFormId(column.component!.dataSourceFormId ?? "");
+    setDraftDataSourceFieldId(column.component!.dataSourceFieldId ?? "");
     setEditOpen(true);
   };
 
@@ -147,22 +179,33 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
       updateComponent(column.component.id, {
         label: draftLabel,
         options: draftOptions,
+        dataSourceFormId: draftDataSourceFormId || undefined,
+        dataSourceFieldId: draftDataSourceFieldId || undefined,
       });
     setEditOpen(false);
   };
 
   const handleAddOption = () => {
-    if (!newOptionLabel.trim()) return;
-    const label = newOptionLabel.trim();
+    if (!newOptionLabel.trim() && !newOptionFieldId) return;
+    const label =
+      newOptionLabel.trim() ||
+      linkedFormFields.find((f) => f.id === newOptionFieldId)?.label ||
+      "Opção";
     setDraftOptions((prev) => [
       ...prev,
       {
         id: crypto.randomUUID(),
         label,
-        value: label.toLowerCase().replace(/\s+/g, "_"),
+        value: newOptionFieldId
+          ? `${newOptionFormId}.${newOptionFieldId}`
+          : label.toLowerCase().replace(/\s+/g, "_"),
+        linkedFormId: newOptionFormId || undefined,
+        linkedFieldId: newOptionFieldId || undefined,
       },
     ]);
     setNewOptionLabel("");
+    setNewOptionFormId("");
+    setNewOptionFieldId("");
     setAddOptionOpen(false);
   };
   return (
@@ -260,40 +303,89 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
               >
                 Opções
               </Typography>
-              <List dense disablePadding>
-                {draftOptions.map((opt) => (
-                  <ListItem
-                    key={opt.id}
-                    disableGutters
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        size="small"
-                        onClick={() =>
-                          setDraftOptions((p) =>
-                            p.filter((o) => o.id !== opt.id),
-                          )
-                        }
-                      >
-                        <DeleteOutline fontSize="small" />
-                      </IconButton>
+
+              {/* Data source section */}
+              <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+                <InputLabel>Fonte de dados (formulário)</InputLabel>
+                <Select
+                  label="Fonte de dados (formulário)"
+                  value={draftDataSourceFormId}
+                  onChange={(e) => {
+                    setDraftDataSourceFormId(e.target.value as string);
+                    setDraftDataSourceFieldId("");
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>Nenhum — opções manuais</em>
+                  </MenuItem>
+                  {allForms.map((f) => (
+                    <MenuItem key={f.id} value={f.id}>
+                      {f.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {draftDataSourceFormId && (
+                <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
+                  <InputLabel>Campo do formulário</InputLabel>
+                  <Select
+                    label="Campo do formulário"
+                    value={draftDataSourceFieldId}
+                    onChange={(e) =>
+                      setDraftDataSourceFieldId(e.target.value as string)
                     }
                   >
-                    <ListItemText primary={opt.label} />
-                  </ListItem>
-                ))}
-              </List>
-              <Button
-                size="small"
-                startIcon={<AddOutlined />}
-                onClick={() => {
-                  setNewOptionLabel("");
-                  setAddOptionOpen(true);
-                }}
-                sx={{ mt: 0.5 }}
-              >
-                Adicionar opção
-              </Button>
+                    <MenuItem value="">
+                      <em>Selecione um campo</em>
+                    </MenuItem>
+                    {dataSourceFields.map((f) => (
+                      <MenuItem key={f.id} value={f.id}>
+                        {f.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+
+              {/* Manual options — only shown when no data source is configured */}
+              {!draftDataSourceFormId && (
+                <>
+                  <List dense disablePadding>
+                    {draftOptions.map((opt) => (
+                      <ListItem
+                        key={opt.id}
+                        disableGutters
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            size="small"
+                            onClick={() =>
+                              setDraftOptions((p) =>
+                                p.filter((o) => o.id !== opt.id),
+                              )
+                            }
+                          >
+                            <DeleteOutline fontSize="small" />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemText primary={opt.label} />
+                      </ListItem>
+                    ))}
+                  </List>
+                  <Button
+                    size="small"
+                    startIcon={<AddOutlined />}
+                    onClick={() => {
+                      setNewOptionLabel("");
+                      setAddOptionOpen(true);
+                    }}
+                    sx={{ mt: 0.5 }}
+                  >
+                    Adicionar opção
+                  </Button>
+                </>
+              )}
             </>
           )}
         </DialogContent>
@@ -319,7 +411,6 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
         </DialogActions>
       </Dialog>
 
-      {/* Add option nested modal */}
       <Dialog
         open={addOptionOpen}
         onClose={() => setAddOptionOpen(false)}
@@ -335,9 +426,56 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
             label="Nome da opção"
             value={newOptionLabel}
             onChange={(e) => setNewOptionLabel(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddOption()}
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, mb: 2 }}
           />
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <InputLabel>Vincular a formulário</InputLabel>
+            <Select
+              label="Vincular a formulário"
+              value={newOptionFormId}
+              onChange={(e) => {
+                setNewOptionFormId(e.target.value as string);
+                setNewOptionFieldId("");
+              }}
+            >
+              <MenuItem value="">
+                <em>Nenhum</em>
+              </MenuItem>
+              {allForms.map((f) => (
+                <MenuItem key={f.id} value={f.id}>
+                  {f.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {newOptionFormId && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Campo do formulário</InputLabel>
+              <Select
+                label="Campo do formulário"
+                value={newOptionFieldId}
+                onChange={(e) => {
+                  const fieldId = e.target.value as string;
+                  setNewOptionFieldId(fieldId);
+                  if (!newOptionLabel) {
+                    const field = linkedFormFields.find(
+                      (f) => f.id === fieldId,
+                    );
+                    if (field) setNewOptionLabel(field.label);
+                  }
+                }}
+              >
+                <MenuItem value="">
+                  <em>Selecione um campo</em>
+                </MenuItem>
+                {linkedFormFields.map((f) => (
+                  <MenuItem key={f.id} value={f.id}>
+                    {f.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
         </DialogContent>
         <DialogActions>
           <Button color="inherit" onClick={() => setAddOptionOpen(false)}>
@@ -346,7 +484,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
           <Button
             variant="contained"
             onClick={handleAddOption}
-            disabled={!newOptionLabel.trim()}
+            disabled={!newOptionLabel.trim() && !newOptionFieldId}
           >
             Adicionar
           </Button>

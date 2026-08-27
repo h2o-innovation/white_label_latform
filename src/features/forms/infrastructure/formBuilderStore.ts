@@ -17,6 +17,8 @@ export interface SelectOption {
   id: string;
   label: string;
   value: string;
+  linkedFormId?: string;
+  linkedFieldId?: string;
 }
 
 export interface FormComponent {
@@ -26,6 +28,8 @@ export interface FormComponent {
   placeholder: string;
   required: boolean;
   options: SelectOption[];
+  dataSourceFormId?: string;
+  dataSourceFieldId?: string;
 }
 
 export interface FormColumn {
