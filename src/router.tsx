@@ -1,5 +1,6 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "./shared/components/layout/AppLayout";
+import { LoginPage } from "./features/auth/presentation/LoginPage";
 import { CategoriesPage } from "./features/categories/presentation/CategoriesPage";
 import { CategoryDetailPage } from "./features/categories/presentation/CategoryDetailPage";
 import { ClientsPage } from "./features/clients/presentation/ClientsPage";
@@ -10,6 +11,7 @@ import { FormsPage } from "./features/forms/presentation/FormsPage";
 import { SettingsPage } from "./features/settings/presentation/SettingsPage";
 
 export const router = createBrowserRouter([
+  { path: "/login", element: <LoginPage /> },
   {
     path: "/",
     element: <AppLayout />,

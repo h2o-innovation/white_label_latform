@@ -1,9 +1,19 @@
-import { Box, Button, Toolbar, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import AddOutlined from "@mui/icons-material/AddOutlined";
-import { useLocation, useMatch } from "react-router-dom";
+import LogoutOutlined from "@mui/icons-material/LogoutOutlined";
+import { useLocation, useMatch, useNavigate } from "react-router-dom";
 import { useModalStore } from "../../stores/modalStore";
 import { useFormsStore } from "../../../features/forms/infrastructure/formsStore";
 import { useCategoriesStore } from "../../../features/categories/infrastructure/categoriesStore";
+import { useAuthStore } from "../../stores/authStore";
 
 const titles: Record<string, string> = {
   "/clients": "Clientes",
@@ -24,6 +34,14 @@ export function Header() {
   const groups = useCategoriesStore((s) => s.groups);
   const openModal = useModalStore((state) => state.openModal);
   const isClientsPage = location.pathname === "/clients";
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const logout = useAuthStore((s) => s.logout);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   const editedForm = formCategories.find(
     (c) => c.id === formsEditMatch?.params.categoryId,
@@ -52,7 +70,15 @@ export function Header() {
         <Typography variant="h5" color="text.primary">
           {title}
         </Typography>
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
           {isClientsPage && (
             <Button
               variant="contained"
@@ -61,6 +87,20 @@ export function Header() {
             >
               Novo Cadastro
             </Button>
+          )}
+          {currentUser && (
+            <>
+              <Chip
+                label={currentUser.nombre}
+                size="small"
+                variant="outlined"
+              />
+              <Tooltip title="Sair">
+                <IconButton size="small" onClick={handleLogout}>
+                  <LogoutOutlined fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
         </Box>
       </Toolbar>
