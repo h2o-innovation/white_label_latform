@@ -9,7 +9,6 @@ import {
   Box,
 } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
-import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import { NavLink, useLocation } from "react-router-dom";
 import { useFormsStore } from "../../../features/forms/infrastructure/formsStore";
@@ -47,17 +46,6 @@ export function Sidebar() {
         </Box>
       </Toolbar>
       <List sx={{ px: 1.5, pt: 2 }}>
-        <ListItemButton
-          component={NavLink}
-          to="/clients"
-          selected={location.pathname === "/clients"}
-          sx={{ borderRadius: 2, mb: 0.5 }}
-        >
-          <ListItemIcon>
-            <PeopleAltOutlined />
-          </ListItemIcon>
-          <ListItemText primary="Clientes" />
-        </ListItemButton>
         <ListItemButton
           component={NavLink}
           to="/forms"

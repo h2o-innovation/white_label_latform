@@ -6,6 +6,7 @@ import { useModalStore } from "../../stores/modalStore";
 const titles: Record<string, string> = {
   "/clients": "Clientes",
   "/forms": "Formulários",
+  "/forms/new": "Novo Formulário",
   "/settings": "Configurações",
 };
 
