@@ -8,4 +8,5 @@ export interface StepProps {
   watch: UseFormWatch<ClientFormData>
   setValue: UseFormSetValue<ClientFormData>
   onTypeChange?: (type: ClientFormData['tipoCadastro']) => void
+  readOnly?: boolean
 }
