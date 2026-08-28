@@ -95,12 +95,25 @@ function ComponentPreview({ component }: { component: FormComponent }) {
           }}
         >
           {component.url ? (
-            <Box component="img" src={component.url} alt={component.label}
-              sx={{ width: "100%", maxHeight: 120, objectFit: "cover", display: "block" }} />
+            <Box
+              component="img"
+              src={component.url}
+              alt={component.label}
+              sx={{
+                width: "100%",
+                maxHeight: 120,
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
           ) : (
             <Box sx={{ p: 2 }}>
               <ImageOutlined sx={{ color: "text.disabled", fontSize: 32 }} />
-              <Typography variant="caption" display="block" color="text.disabled">
+              <Typography
+                variant="caption"
+                display="block"
+                color="text.disabled"
+              >
                 {component.label}
               </Typography>
             </Box>
@@ -305,7 +318,10 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
           />
           {column.component?.type === "image" && (
             <TextField
-              fullWidth size="small" label="URL da imagem" placeholder="https://..."
+              fullWidth
+              size="small"
+              label="URL da imagem"
+              placeholder="https://..."
               value={draftUrl}
               onChange={(e) => setDraftUrl(e.target.value)}
               sx={{ mt: 2 }}
@@ -542,10 +558,23 @@ function RowCard({ row }: RowCardProps) {
     >
       <Box
         className="row-actions"
-        sx={{ position: "absolute", top: 4, right: 4, opacity: 0, transition: "opacity 0.15s", display: "flex", gap: 0.5, zIndex: 1 }}
+        sx={{
+          position: "absolute",
+          top: 4,
+          right: 4,
+          opacity: 0,
+          transition: "opacity 0.15s",
+          display: "flex",
+          gap: 0.5,
+          zIndex: 1,
+        }}
       >
         <Tooltip title="Remover linha">
-          <IconButton size="small" color="error" onClick={() => removeRow(activeStepId, row.id)}>
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => removeRow(activeStepId, row.id)}
+          >
             <DeleteOutline fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -556,10 +585,20 @@ function RowCard({ row }: RowCardProps) {
             {row.columns.length > 1 && (
               <Box
                 className="row-actions"
-                sx={{ position: "absolute", top: -4, right: -4, opacity: 0, transition: "opacity 0.15s", zIndex: 2 }}
+                sx={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  opacity: 0,
+                  transition: "opacity 0.15s",
+                  zIndex: 2,
+                }}
               >
                 <Tooltip title="Remover coluna">
-                  <IconButton size="small" color="error" onClick={() => removeColumn(row.id, col.id)}
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => removeColumn(row.id, col.id)}
                     sx={{ bgcolor: "background.paper", width: 18, height: 18 }}
                   >
                     <DeleteOutline sx={{ fontSize: 12 }} />
@@ -577,7 +616,11 @@ function RowCard({ row }: RowCardProps) {
         ))}
         {row.columns.length < 3 && (
           <Tooltip title="Adicionar coluna">
-            <IconButton size="small" onClick={() => addColumn(row.id)} sx={{ alignSelf: "center" }}>
+            <IconButton
+              size="small"
+              onClick={() => addColumn(row.id)}
+              sx={{ alignSelf: "center" }}
+            >
               <ViewColumnOutlined fontSize="small" />
             </IconButton>
           </Tooltip>

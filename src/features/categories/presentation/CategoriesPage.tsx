@@ -34,7 +34,9 @@ export function CategoriesPage() {
 
   const [open, setOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<(typeof groups)[0] | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<(typeof groups)[0] | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<(typeof groups)[0] | null>(
+    null,
+  );
   const [name, setName] = useState("");
   const [selectedForms, setSelectedForms] = useState<FormCategory[]>([]);
 
@@ -96,11 +98,29 @@ export function CategoriesPage() {
               {group.formIds.length}{" "}
               {group.formIds.length === 1 ? "formulário" : "formulários"}
             </Typography>
-            <Box className="edit-btn" sx={{ position: "absolute", top: 6, right: 6, opacity: 0, transition: "opacity 0.15s", display: "flex", gap: 0.5 }}>
+            <Box
+              className="edit-btn"
+              sx={{
+                position: "absolute",
+                top: 6,
+                right: 6,
+                opacity: 0,
+                transition: "opacity 0.15s",
+                display: "flex",
+                gap: 0.5,
+              }}
+            >
               <IconButton size="small" onClick={(e) => openEdit(e, group)}>
                 <EditOutlined fontSize="small" />
               </IconButton>
-              <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); setDeleteTarget(group); }}>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteTarget(group);
+                }}
+              >
                 <DeleteOutline fontSize="small" />
               </IconButton>
             </Box>
@@ -170,12 +190,26 @@ export function CategoriesPage() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} maxWidth="xs">
+      <Dialog
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        maxWidth="xs"
+      >
         <DialogTitle>Excluir categoria?</DialogTitle>
-        <DialogContent>A categoria "<strong>{deleteTarget?.name}</strong>" será removida permanentemente.</DialogContent>
+        <DialogContent>
+          A categoria "<strong>{deleteTarget?.name}</strong>" será removida
+          permanentemente.
+        </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteTarget(null)}>Cancelar</Button>
-          <Button color="error" variant="contained" onClick={() => { if (deleteTarget) removeGroup(deleteTarget.id); setDeleteTarget(null); }}>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              if (deleteTarget) removeGroup(deleteTarget.id);
+              setDeleteTarget(null);
+            }}
+          >
             Excluir
           </Button>
         </DialogActions>

@@ -77,11 +77,29 @@ export function FormsPage() {
               {cat.name}
             </Typography>
             {isAdmin && (
-              <Box className="edit-btn" sx={{ position: "absolute", top: 6, right: 6, opacity: 0, transition: "opacity 0.15s", display: "flex", gap: 0.5 }}>
+              <Box
+                className="edit-btn"
+                sx={{
+                  position: "absolute",
+                  top: 6,
+                  right: 6,
+                  opacity: 0,
+                  transition: "opacity 0.15s",
+                  display: "flex",
+                  gap: 0.5,
+                }}
+              >
                 <IconButton size="small" onClick={(e) => openEdit(e, cat)}>
                   <EditOutlined fontSize="small" />
                 </IconButton>
-                <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); setDeleteTarget(cat); }}>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTarget(cat);
+                  }}
+                >
                   <DeleteOutline fontSize="small" />
                 </IconButton>
               </Box>
@@ -142,12 +160,26 @@ export function FormsPage() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} maxWidth="xs">
+      <Dialog
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        maxWidth="xs"
+      >
         <DialogTitle>Excluir formulário?</DialogTitle>
-        <DialogContent>O formulário "<strong>{deleteTarget?.name}</strong>" e todas as suas entradas serão removidos permanentemente.</DialogContent>
+        <DialogContent>
+          O formulário "<strong>{deleteTarget?.name}</strong>" e todas as suas
+          entradas serão removidos permanentemente.
+        </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteTarget(null)}>Cancelar</Button>
-          <Button color="error" variant="contained" onClick={() => { if (deleteTarget) removeCategory(deleteTarget.id); setDeleteTarget(null); }}>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              if (deleteTarget) removeCategory(deleteTarget.id);
+              setDeleteTarget(null);
+            }}
+          >
             Excluir
           </Button>
         </DialogActions>
