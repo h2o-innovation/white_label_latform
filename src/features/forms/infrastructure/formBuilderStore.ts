@@ -94,6 +94,7 @@ interface FormBuilderStore {
   removeEdge: (id: string) => void;
   reset: () => void;
   loadSteps: (steps: FormStep[]) => void;
+  insertSteps: (steps: FormStep[]) => void;
 }
 
 export const useFormBuilderStore = create<FormBuilderStore>((set, get) => {
@@ -245,6 +246,49 @@ export const useFormBuilderStore = create<FormBuilderStore>((set, get) => {
         activeStepId: steps[0]?.id ?? "",
         selectedComponentId: null,
         edges: [],
+      });
+    },
+
+    insertSteps: (templateSteps) => {
+      const makeId = () => uid();
+      const clonedSteps = templateSteps.map((templateStep) => ({
+        ...templateStep,
+        id: makeId(),
+        rows: templateStep.rows.map((row) => ({
+          ...row,
+          id: makeId(),
+          columns: row.columns.map((column) => ({
+            ...column,
+            id: makeId(),
+            component: column.component
+              ? {
+                  ...column.component,
+                  id: makeId(),
+                  options: column.component.options.map((option) => ({
+                    ...option,
+                    id: makeId(),
+                  })),
+                }
+              : null,
+          })),
+        })),
+      }));
+
+      set((state) => {
+        const isInitialBlankStep =
+          state.steps.length === 1 &&
+          state.steps[0].rows.length === 1 &&
+          state.steps[0].rows[0].columns.length === 1 &&
+          state.steps[0].rows[0].columns[0].component === null;
+        const steps = isInitialBlankStep
+          ? clonedSteps
+          : [...state.steps, ...clonedSteps];
+        return {
+          steps,
+          activeStepId: clonedSteps[0]?.id ?? state.activeStepId,
+          selectedComponentId: null,
+          edges: [],
+        };
       });
     },
   };

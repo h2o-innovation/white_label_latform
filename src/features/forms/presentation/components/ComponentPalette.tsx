@@ -9,6 +9,8 @@ import ArrowDropDownCircleOutlined from "@mui/icons-material/ArrowDropDownCircle
 import LibraryAddCheckOutlined from "@mui/icons-material/LibraryAddCheckOutlined";
 import ImageOutlined from "@mui/icons-material/ImageOutlined";
 import type { ComponentType } from "../../infrastructure/formBuilderStore";
+import ViewQuiltOutlined from "@mui/icons-material/ViewQuiltOutlined";
+import { formTemplates, type FormTemplate } from "../../application/formTemplates";
 
 interface PaletteEntry {
   type: ComponentType;
@@ -102,6 +104,45 @@ function DraggableItem({ type, label, icon }: PaletteEntry) {
   );
 }
 
+function DraggableTemplate({ template }: { template: FormTemplate }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `template-${template.id}`,
+    data: { source: "template", template },
+  });
+
+  return (
+    <Box
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 1,
+        px: 1.5,
+        py: 1,
+        mb: 0.5,
+        borderRadius: 1,
+        cursor: "grab",
+        border: "1px solid",
+        borderColor: isDragging ? "primary.main" : "divider",
+        bgcolor: isDragging ? "primary.50" : "background.paper",
+        opacity: isDragging ? 0.4 : 1,
+        userSelect: "none",
+        "&:hover": { bgcolor: "action.hover", borderColor: "text.disabled" },
+      }}
+    >
+      <ViewQuiltOutlined fontSize="small" />
+      <Box>
+        <Typography variant="body2">{template.name}</Typography>
+        <Typography variant="caption" color="text.secondary">
+          {template.steps.length} passos
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
+
 export function ComponentPalette() {
   return (
     <Box
@@ -136,6 +177,17 @@ export function ComponentPalette() {
             <DraggableItem key={item.type} {...item} />
           ))}
         </Box>
+      ))}
+      <Divider sx={{ my: 1.5 }} />
+      <Typography
+        variant="caption"
+        color="text.disabled"
+        sx={{ display: "block", mb: 1 }}
+      >
+        Templates
+      </Typography>
+      {formTemplates.map((template) => (
+        <DraggableTemplate key={template.id} template={template} />
       ))}
     </Box>
   );

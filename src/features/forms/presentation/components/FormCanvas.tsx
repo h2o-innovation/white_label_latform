@@ -626,16 +626,24 @@ function RowCard({ row }: RowCardProps) {
 export function FormCanvas() {
   const { formBuilder } = useAppServices();
   const { steps, activeStepId, setActiveStep, addRow, setSelectedComponent } = formBuilder;
+  const { setNodeRef: setCanvasRef, isOver: isTemplateOver } = useDroppable({
+    id: "form-canvas",
+    data: { target: "canvas" },
+  });
 
   const activeStep = steps.find((s) => s.id === activeStepId);
 
   return (
     <Box
+      ref={setCanvasRef}
       sx={{
         flex: 1,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        outline: isTemplateOver ? "2px dashed" : "none",
+        outlineColor: "primary.main",
+        outlineOffset: -2,
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) setSelectedComponent(null);
