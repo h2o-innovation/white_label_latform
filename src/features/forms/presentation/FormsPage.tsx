@@ -78,7 +78,19 @@ export function FormsPage() {
               "&:hover .edit-btn": { opacity: 1 },
             }}
           >
-            <Typography variant="subtitle1" fontWeight={600}>
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              title={cat.name}
+              sx={{
+                width: "100%",
+                px: 1.5,
+                textAlign: "center",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {cat.name}
             </Typography>
             <Typography variant="caption" color="text.secondary">

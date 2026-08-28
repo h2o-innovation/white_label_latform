@@ -3,7 +3,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  ButtonBase,
   Dialog,
   DialogActions,
   DialogContent,
@@ -76,8 +75,15 @@ export function CategoriesPage() {
         {groups.map((group) => (
           <Paper
             key={group.id}
-            component={ButtonBase}
             onClick={() => navigate(`/categories/${group.id}`)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                navigate(`/categories/${group.id}`);
+              }
+            }}
+            role="button"
+            tabIndex={0}
             sx={{
               ...blockSx,
               bgcolor: "background.paper",
@@ -86,7 +92,19 @@ export function CategoriesPage() {
               "&:hover .edit-btn": { opacity: 1 },
             }}
           >
-            <Typography variant="subtitle1" fontWeight={600}>
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              title={group.name}
+              sx={{
+                width: "100%",
+                px: 1.5,
+                textAlign: "center",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {group.name}
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -122,8 +140,15 @@ export function CategoriesPage() {
           </Paper>
         ))}
         <Paper
-          component={ButtonBase}
           onClick={() => openCreate()}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openCreate();
+            }
+          }}
+          role="button"
+          tabIndex={0}
           sx={{
             ...blockSx,
             bgcolor: "primary.main",
