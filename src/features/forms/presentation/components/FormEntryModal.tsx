@@ -27,7 +27,7 @@ import type {
   EntryData,
   FormEntry,
 } from "../../infrastructure/formEntriesStore";
-import { useFormEntriesStore } from "../../infrastructure/formEntriesStore";
+import { useAppServices } from "../../../../shared/application/AppServicesContext";
 
 type ResolvedOption = { id: string; label: string; value: string };
 
@@ -195,7 +195,8 @@ function StepFields({
   control: ReturnType<typeof useForm>["control"];
   disabled: boolean;
 }) {
-  const allEntries = useFormEntriesStore((s) => s.entries);
+  const { formEntries } = useAppServices();
+  const allEntries = formEntries.entries;
 
   const resolveOptions = (comp: FormComponent): ResolvedOption[] => {
     if (comp.dataSourceFormId && comp.dataSourceFieldId) {

@@ -16,12 +16,8 @@ import {
   TextField,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useFormsStore } from "../infrastructure/formsStore";
-import {
-  useFormBuilderStore,
-  defaultLabel,
-  type ComponentType,
-} from "../infrastructure/formBuilderStore";
+import { defaultLabel, type ComponentType } from "../infrastructure/formBuilderStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 import { ComponentPalette } from "./components/ComponentPalette";
 import { FormCanvas } from "./components/FormCanvas";
 import { FlowPanel } from "./components/FlowPanel";
@@ -32,17 +28,10 @@ export function CreateFormPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const isEdit = !!categoryId;
 
-  const addCategory = useFormsStore((s) => s.addCategory);
-  const updateCategory = useFormsStore((s) => s.updateCategory);
-  const existingCategory = useFormsStore((s) =>
-    s.categories.find((c) => c.id === categoryId),
-  );
-
-  const setComponent = useFormBuilderStore((s) => s.setComponent);
-  const selectedComponentId = useFormBuilderStore((s) => s.selectedComponentId);
-  const steps = useFormBuilderStore((s) => s.steps);
-  const reset = useFormBuilderStore((s) => s.reset);
-  const loadSteps = useFormBuilderStore((s) => s.loadSteps);
+  const { forms, formBuilder } = useAppServices();
+  const { addCategory, updateCategory } = forms;
+  const existingCategory = forms.categories.find((c) => c.id === categoryId);
+  const { setComponent, selectedComponentId, steps, reset, loadSteps } = formBuilder;
 
   useEffect(() => {
     if (isEdit && existingCategory?.steps?.length) {

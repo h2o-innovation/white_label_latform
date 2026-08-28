@@ -21,27 +21,19 @@ import {
   Typography,
 } from "@mui/material";
 import EditOutlined from "@mui/icons-material/EditOutlined";
-import { useCategoriesStore } from "../infrastructure/categoriesStore";
-import {
-  useFormsStore,
-  type FormCategory,
-} from "../../forms/infrastructure/formsStore";
-import { usePermissionsStore } from "../infrastructure/permissionsStore";
-import {
-  useUsersStore,
-  type User,
-} from "../../users/infrastructure/usersStore";
+import type { FormCategory } from "../../forms/infrastructure/formsStore";
+import type { User } from "../../users/infrastructure/usersStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 
 export function CategoryDetailPage() {
   const { groupId = "" } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const group = useCategoriesStore((s) =>
-    s.groups.find((g) => g.id === groupId),
-  );
-  const allForms = useFormsStore((s) => s.categories);
-  const allUsers = useUsersStore((s) => s.users);
-  const getUserIds = usePermissionsStore((s) => s.getUserIds);
-  const setPermissions = usePermissionsStore((s) => s.setPermissions);
+  const { categories, forms: formsService, users, permissions } = useAppServices();
+  const group = categories.groups.find((g) => g.id === groupId);
+  const allForms = formsService.categories;
+  const allUsers = users.users;
+  const getUserIds = permissions.getUserIds;
+  const setPermissions = permissions.setPermissions;
 
   const [permTarget, setPermTarget] = useState<FormCategory | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);

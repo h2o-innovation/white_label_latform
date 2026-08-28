@@ -6,8 +6,7 @@ import { clientSchema } from '../domain/clientSchema'
 import type { ClientEntry, ClientFormData } from '../domain/types'
 import { createClient } from '../application/createClient'
 import { updateClient } from '../application/updateClient'
-import { useClientsStore } from '../infrastructure/clientsStore'
-import { useModalStore } from '../../../shared/stores/modalStore'
+import { useAppServices } from '../../../shared/application/AppServicesContext'
 import { Step1BasicData } from './steps/Step1BasicData'
 import { Step2Location } from './steps/Step2Location'
 import { Step3Contacts } from './steps/Step3Contacts'
@@ -37,11 +36,12 @@ interface ClientFormModalProps {
 }
 
 export function ClientFormModal({ editTarget, onClosed, viewOnly, externalOpen, onExternalClose }: ClientFormModalProps) {
-  const open = useModalStore((state) => state.open)
-  const closeModal = useModalStore((state) => state.closeModal)
+  const { clients, modal } = useAppServices()
+  const open = modal.open
+  const closeModal = modal.closeModal
   const isOpen = externalOpen !== undefined ? externalOpen : open
-  const addClient = useClientsStore((state) => state.addClient)
-  const updateClientStore = useClientsStore((state) => state.updateClient)
+  const addClient = clients.addClient
+  const updateClientStore = clients.updateClient
   const [currentStep, setCurrentStep] = useState(0)
   const [pendingType, setPendingType] = useState<ClientFormData['tipoCadastro'] | null>(null)
   const [snackbar, setSnackbar] = useState('')

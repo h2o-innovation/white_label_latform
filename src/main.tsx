@@ -2,12 +2,14 @@ import { StrictMode, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createAppTheme } from "./theme";
-import { useThemeStore } from "./shared/stores/themeStore";
+import { useAppServices } from "./shared/application/AppServicesContext";
 import "./index.css";
 import App from "./App.tsx";
+import { AppServicesProvider } from "./AppServicesProvider";
 
 function ThemedApp() {
-  const mode = useThemeStore((s) => s.mode);
+  const { theme: themeService } = useAppServices();
+  const mode = themeService.mode;
   const theme = useMemo(() => createAppTheme(mode), [mode]);
   return (
     <ThemeProvider theme={theme}>
@@ -19,6 +21,8 @@ function ThemedApp() {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemedApp />
+    <AppServicesProvider>
+      <ThemedApp />
+    </AppServicesProvider>
   </StrictMode>,
 );

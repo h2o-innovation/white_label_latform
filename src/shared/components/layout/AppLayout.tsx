@@ -2,10 +2,10 @@ import { Box } from "@mui/material";
 import { Navigate, Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
-import { useAuthStore } from "../../stores/authStore";
+import { useAppServices } from "../../application/AppServicesContext";
 
 export function AppLayout() {
-  const currentUser = useAuthStore((s) => s.currentUser);
+  const { auth: { currentUser } } = useAppServices();
   if (!currentUser) return <Navigate to="/login" replace />;
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", width: "100%" }}>

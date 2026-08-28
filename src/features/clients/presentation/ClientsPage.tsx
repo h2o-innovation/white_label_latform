@@ -4,10 +4,9 @@ import DeleteOutline from '@mui/icons-material/DeleteOutline'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined'
 import { MaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
-import { useClientsStore } from '../infrastructure/clientsStore'
+import { useAppServices } from '../../../shared/application/AppServicesContext'
 import { deleteClient } from '../application/deleteClient'
 import type { ClientEntry } from '../domain/types'
-import { useModalStore } from '../../../shared/stores/modalStore'
 import { ClientFormModal } from './ClientFormModal'
 
 const typeLabels: Record<ClientEntry['tipoCadastro'], string> = { pessoaFisica: 'Pessoa Física', pessoaJuridica: 'Pessoa Jurídica' }
@@ -15,9 +14,9 @@ const segmentLabels: Record<ClientEntry['segmentacao'], string> = { vendaDireta:
 const clientLabels: Record<ClientEntry['tipoCliente'], string> = { cooperativa: 'Cooperativa', revenda: 'Revenda', produtorRural: 'Produtor rural', empresaAgropecuaria: 'Empresa agropecuária', usina: 'Usina' }
 
 export function ClientsPage() {
-  const clients = useClientsStore((state) => state.clients)
-  const removeClient = useClientsStore((state) => state.removeClient)
-  const openModal = useModalStore((state) => state.openModal)
+  const { clients: clientsService, modal } = useAppServices()
+  const { clients, removeClient } = clientsService
+  const openModal = modal.openModal
   const [editTarget, setEditTarget] = useState<ClientEntry | null>(null)
   const [viewTarget, setViewTarget] = useState<ClientEntry | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ClientEntry | null>(null)

@@ -15,14 +15,13 @@ import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { useUsersStore, type User } from "../infrastructure/usersStore";
+import type { User } from "../infrastructure/usersStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 import { UserFormModal } from "./UserFormModal";
 
 export function UsersPage() {
-  const users = useUsersStore((s) => s.users);
-  const addUser = useUsersStore((s) => s.addUser);
-  const updateUser = useUsersStore((s) => s.updateUser);
-  const removeUser = useUsersStore((s) => s.removeUser);
+  const { users: usersService } = useAppServices();
+  const { users, addUser, updateUser, removeUser } = usersService;
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<User | null>(null);

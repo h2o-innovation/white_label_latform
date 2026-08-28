@@ -9,17 +9,11 @@ import {
   Typography,
 } from "@mui/material";
 import AddOutlined from "@mui/icons-material/AddOutlined";
-import { useFormBuilderStore } from "../../infrastructure/formBuilderStore";
+import { useAppServices } from "../../../../shared/application/AppServicesContext";
 
 export function FlowPanel() {
-  const steps = useFormBuilderStore((s) => s.steps);
-  const activeStepId = useFormBuilderStore((s) => s.activeStepId);
-  const edges = useFormBuilderStore((s) => s.edges);
-  const addStep = useFormBuilderStore((s) => s.addStep);
-  const setActiveStep = useFormBuilderStore((s) => s.setActiveStep);
-  const addEdge = useFormBuilderStore((s) => s.addEdge);
-  const updateEdge = useFormBuilderStore((s) => s.updateEdge);
-  const removeEdge = useFormBuilderStore((s) => s.removeEdge);
+  const { formBuilder } = useAppServices();
+  const { steps, activeStepId, edges, addStep, setActiveStep, addEdge, updateEdge, removeEdge } = formBuilder;
 
   return (
     <Box
