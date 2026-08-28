@@ -1,6 +1,6 @@
-# H2O Nexo
+# H2O Proteus
 
-A white-label platform built with React, TypeScript, and Vite.
+Motor white label de procesos operativos y comerciales.
 
 ## Prerequisites
 
