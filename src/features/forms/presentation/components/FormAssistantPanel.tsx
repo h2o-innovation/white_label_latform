@@ -57,11 +57,17 @@ export function FormAssistantPanel({ onClose }: FormAssistantPanelProps) {
   return (
     <Box
       sx={{
-        width: 320,
-        flexShrink: 0,
+        position: "fixed",
+        right: { xs: 12, sm: 24 },
+        bottom: { xs: 12, sm: 24 },
+        width: { xs: "calc(100vw - 24px)", sm: 360 },
+        height: { xs: "min(560px, calc(100vh - 24px))", sm: 560 },
+        zIndex: 1200,
         bgcolor: "background.paper",
-        borderLeft: "1px solid",
+        border: "1px solid",
         borderColor: "divider",
+        borderRadius: 3,
+        boxShadow: 8,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -131,9 +137,14 @@ export function FormAssistantPanel({ onClose }: FormAssistantPanelProps) {
           label="Prompt"
           InputProps={{
             endAdornment: (
-              <IconButton type="submit" color="primary" disabled={!prompt.trim() || loading} aria-label="Gerar formulário">
-                ➤
-              </IconButton>
+              <Button
+                type="submit"
+                size="small"
+                variant="contained"
+                disabled={!prompt.trim() || loading}
+              >
+                Enviar
+              </Button>
             ),
           }}
         />

@@ -13,9 +13,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   TextField,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import proteusIcon from "../../../assets/proteus.png";
 import { defaultLabel, type ComponentType } from "../infrastructure/formBuilderStore";
 import { useAppServices } from "../../../shared/application/AppServicesContext";
 import type { FormTemplate } from "../application/formTemplates";
@@ -121,12 +123,6 @@ export function CreateFormPage() {
         >
           Salvar formulário
         </Button>
-        <Button
-          variant={assistantOpen ? "outlined" : "text"}
-          onClick={() => setAssistantOpen((open) => !open)}
-        >
-          ✨ Assistente
-        </Button>
       </Box>
 
       {/* 3-panel builder */}
@@ -147,6 +143,34 @@ export function CreateFormPage() {
           <FlowPanel />
         )}
       </Box>
+
+      {!assistantOpen && (
+        <IconButton
+          onClick={() => setAssistantOpen(true)}
+          aria-label="Abrir assistente de formulário"
+          sx={{
+            position: "fixed",
+            right: { xs: 16, sm: 24 },
+            bottom: { xs: 16, sm: 24 },
+            zIndex: 1200,
+            width: 64,
+            height: 64,
+            bgcolor: "primary.main",
+            border: "3px solid",
+            borderColor: "background.paper",
+            boxShadow: 4,
+            overflow: "hidden",
+            "&:hover": { bgcolor: "primary.dark" },
+          }}
+        >
+          <Box
+            component="img"
+            src={proteusIcon}
+            alt=""
+            sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </IconButton>
+      )}
 
       {/* Drag ghost */}
       <DragOverlay>
