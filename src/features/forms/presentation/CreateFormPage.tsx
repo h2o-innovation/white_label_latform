@@ -35,12 +35,13 @@ export function CreateFormPage() {
   const { setComponent, selectedComponentId, steps, reset, loadSteps, insertSteps } = formBuilder;
 
   useEffect(() => {
+    setFormName(existingCategory?.name ?? "");
     if (isEdit && existingCategory?.steps?.length) {
       loadSteps(existingCategory.steps);
     } else {
       reset();
     }
-  }, [categoryId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [categoryId, existingCategory?.name]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [namingOpen, setNamingOpen] = useState(false);
   const [formName, setFormName] = useState(existingCategory?.name ?? "");
@@ -49,8 +50,8 @@ export function CreateFormPage() {
 
   const handleSaveClick = () => {
     if (isEdit) {
-      updateCategory(categoryId!, existingCategory?.name ?? "", steps);
-      navigate("/forms");
+      setFormName(existingCategory?.name ?? "");
+      setNamingOpen(true);
     } else {
       setNamingOpen(true);
     }
@@ -85,7 +86,11 @@ export function CreateFormPage() {
 
   const handleConfirm = () => {
     if (!formName.trim()) return;
-    addCategory(formName.trim(), steps);
+    if (isEdit) {
+      updateCategory(categoryId!, formName.trim(), steps);
+    } else {
+      addCategory(formName.trim(), steps);
+    }
     setNamingOpen(false);
     navigate("/forms");
   };
@@ -172,7 +177,7 @@ export function CreateFormPage() {
             onClick={handleConfirm}
             disabled={!formName.trim()}
           >
-            Criar
+            {isEdit ? "Salvar" : "Criar"}
           </Button>
         </DialogActions>
       </Dialog>
