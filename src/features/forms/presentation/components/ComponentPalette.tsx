@@ -8,7 +8,6 @@ import CalendarTodayOutlined from "@mui/icons-material/CalendarTodayOutlined";
 import ArrowDropDownCircleOutlined from "@mui/icons-material/ArrowDropDownCircleOutlined";
 import LibraryAddCheckOutlined from "@mui/icons-material/LibraryAddCheckOutlined";
 import ImageOutlined from "@mui/icons-material/ImageOutlined";
-import AdsClickOutlined from "@mui/icons-material/AdsClickOutlined";
 import type { ComponentType } from "../../infrastructure/formBuilderStore";
 
 interface PaletteEntry {
@@ -65,11 +64,6 @@ const groups: { title: string; items: PaletteEntry[] }[] = [
         type: "image",
         label: "Imagem",
         icon: <ImageOutlined fontSize="small" />,
-      },
-      {
-        type: "button",
-        label: "Botão",
-        icon: <AdsClickOutlined fontSize="small" />,
       },
     ],
   },
