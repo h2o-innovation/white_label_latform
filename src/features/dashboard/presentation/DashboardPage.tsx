@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Avatar,
   Box,
@@ -7,6 +7,7 @@ import {
   CardContent,
   Chip,
   Divider,
+  IconButton,
   LinearProgress,
   List,
   ListItem,
@@ -25,6 +26,8 @@ import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import TrendingUpRounded from "@mui/icons-material/TrendingUpRounded";
 import { useNavigate } from "react-router-dom";
 import { useAppServices } from "../../../shared/application/AppServicesContext";
+import proteusIcon from "../../../assets/proteus.png";
+import { DashboardAssistantPanel } from "./components/DashboardAssistantPanel";
 
 const chartColors = ["#168a5b", "#2d6cdf", "#e5a72e", "#9c5de5", "#ed6a5a"];
 
@@ -119,6 +122,7 @@ function ActivityChart({ values }: { values: number[] }) {
 export function DashboardPage() {
   const navigate = useNavigate();
   const { auth, clients, categories, forms, users, formEntries } = useAppServices();
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const currentUser = auth.currentUser;
 
   const allEntries = Object.values(formEntries.entries).flat();
@@ -232,6 +236,9 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </Box>
+
+      {!assistantOpen && <Tooltip title="Abrir Proteus IA"><IconButton onClick={() => setAssistantOpen(true)} aria-label="Abrir Proteus IA" sx={{ position: "fixed", right: { xs: 16, sm: 24 }, bottom: { xs: 16, sm: 24 }, zIndex: 1200, width: 64, height: 64, bgcolor: "primary.main", border: "3px solid", borderColor: "background.paper", boxShadow: 4, overflow: "hidden", "&:hover": { bgcolor: "primary.dark" } }}><Box component="img" src={proteusIcon} alt="" sx={{ width: "100%", height: "100%", objectFit: "cover" }} /></IconButton></Tooltip>}
+      {assistantOpen && <DashboardAssistantPanel onClose={() => setAssistantOpen(false)} />}
     </Box>
   );
 }
