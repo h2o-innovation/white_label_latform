@@ -29,7 +29,25 @@ import type {
 } from "../../infrastructure/formEntriesStore";
 import { useAppServices } from "../../../../shared/application/AppServicesContext";
 
-type ResolvedOption = { id: string; label: string; value: string };
+type ResolvedOption = { id: string; label: string; value: string; imageUrl?: string };
+
+function OptionContent({ option }: { option: ResolvedOption }) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+      {option.imageUrl ? (
+        <Box
+          component="img"
+          src={option.imageUrl}
+          alt=""
+          sx={{ width: 32, height: 32, borderRadius: 1, objectFit: "cover", flexShrink: 0 }}
+        />
+      ) : (
+        <Box sx={{ width: 32, height: 32, borderRadius: 1, bgcolor: "action.hover", flexShrink: 0 }} />
+      )}
+      <Typography variant="body2" noWrap>{option.label}</Typography>
+    </Box>
+  );
+}
 
 function DynamicField({
   component,
@@ -93,7 +111,7 @@ function DynamicField({
               <Select {...field} label={component.label}>
                 {resolvedOptions.map((o) => (
                   <MenuItem key={o.id} value={o.value}>
-                    {o.label}
+                    <OptionContent option={o} />
                   </MenuItem>
                 ))}
               </Select>
@@ -113,7 +131,7 @@ function DynamicField({
               <Select {...field} multiple label={component.label}>
                 {resolvedOptions.map((o) => (
                   <MenuItem key={o.id} value={o.value}>
-                    {o.label}
+                    <OptionContent option={o} />
                   </MenuItem>
                 ))}
               </Select>
@@ -203,9 +221,15 @@ function StepFields({
       const entries: FormEntry[] = allEntries[comp.dataSourceFormId] ?? [];
       const seen = new Set<string>();
       return entries
-        .map((e) => String(e.data[comp.dataSourceFieldId!] ?? "").trim())
-        .filter((v) => v && !seen.has(v) && seen.add(v))
-        .map((v) => ({ id: v, label: v, value: v }));
+        .map((entry) => {
+          const value = String(entry.data[comp.dataSourceFieldId!] ?? "").trim();
+          const label = String(entry.data[comp.dataSourceLabelFieldId ?? comp.dataSourceFieldId!] ?? value).trim() || value;
+          const imageUrl = comp.dataSourceImageFieldId
+            ? String(entry.data[comp.dataSourceImageFieldId] ?? "").trim()
+            : undefined;
+          return { id: value, label, value, imageUrl };
+        })
+        .filter((option) => option.value && !seen.has(option.value) && seen.add(option.value));
     }
     return comp.options;
   };

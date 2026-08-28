@@ -30,6 +30,8 @@ export interface FormComponent {
   options: SelectOption[];
   dataSourceFormId?: string;
   dataSourceFieldId?: string;
+  dataSourceImageFieldId?: string;
+  dataSourceLabelFieldId?: string;
   url?: string;
 }
 
