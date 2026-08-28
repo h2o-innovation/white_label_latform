@@ -12,6 +12,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -121,6 +122,64 @@ function DynamicField({
         />
       );
     default:
+      if (component.type === "image") {
+        return (
+          <Controller
+            name={component.id}
+            control={control}
+            defaultValue={component.url ?? ""}
+            render={({ field }) => (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {!disabled && (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label={`URL — ${component.label}`}
+                    placeholder="https://..."
+                    {...field}
+                  />
+                )}
+                {field.value ? (
+                  <Box
+                    sx={{
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={field.value as string}
+                      alt={component.label}
+                      sx={{
+                        width: "100%",
+                        maxHeight: 200,
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  <Box
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      border: "1px dashed",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.disabled">
+                      {component.label}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
+          />
+        );
+      }
       return null;
   }
 }
@@ -154,10 +213,7 @@ function StepFields({
       id: row.id,
       fields: row.columns
         .map((c) => c.component)
-        .filter(
-          (c): c is FormComponent =>
-            c !== null && c.type !== "image" && c.type !== "button",
-        ),
+        .filter((c): c is FormComponent => c !== null && c.type !== "button"),
     }))
     .filter((r) => r.fields.length > 0);
 
@@ -237,22 +293,38 @@ export function FormEntryModal({
       </DialogTitle>
       <Divider />
       <DialogContent sx={{ pt: 3 }}>
-        {showStepper && (
-          <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
+        {viewOnly ? (
+          <Stack spacing={3} divider={<Divider />}>
             {steps.map((s) => (
-              <Step key={s.id}>
-                <StepLabel>{s.name}</StepLabel>
-              </Step>
+              <StepFields
+                key={s.id}
+                step={s}
+                register={register}
+                control={control}
+                disabled
+              />
             ))}
-          </Stepper>
-        )}
-        {activeStep && (
-          <StepFields
-            step={activeStep}
-            register={register}
-            control={control}
-            disabled={viewOnly}
-          />
+          </Stack>
+        ) : (
+          <>
+            {showStepper && (
+              <Stepper activeStep={currentStep} alternativeLabel sx={{ mb: 3 }}>
+                {steps.map((s) => (
+                  <Step key={s.id}>
+                    <StepLabel>{s.name}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            )}
+            {activeStep && (
+              <StepFields
+                step={activeStep}
+                register={register}
+                control={control}
+                disabled={false}
+              />
+            )}
+          </>
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>

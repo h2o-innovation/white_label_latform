@@ -90,14 +90,34 @@ function ComponentPreview({ component }: { component: FormComponent }) {
             border: "1px dashed",
             borderColor: "text.disabled",
             borderRadius: 1,
-            p: 2,
+            overflow: "hidden",
             textAlign: "center",
           }}
         >
-          <ImageOutlined sx={{ color: "text.disabled", fontSize: 32 }} />
-          <Typography variant="caption" display="block" color="text.disabled">
-            {component.label}
-          </Typography>
+          {component.url ? (
+            <Box
+              component="img"
+              src={component.url}
+              alt={component.label}
+              sx={{
+                width: "100%",
+                maxHeight: 120,
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          ) : (
+            <Box sx={{ p: 2 }}>
+              <ImageOutlined sx={{ color: "text.disabled", fontSize: 32 }} />
+              <Typography
+                variant="caption"
+                display="block"
+                color="text.disabled"
+              >
+                {component.label}
+              </Typography>
+            </Box>
+          )}
         </Box>
       );
     case "button":
@@ -130,6 +150,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const [draftOptions, setDraftOptions] = useState<SelectOption[]>([]);
   const [draftDataSourceFormId, setDraftDataSourceFormId] = useState("");
   const [draftDataSourceFieldId, setDraftDataSourceFieldId] = useState("");
+  const [draftUrl, setDraftUrl] = useState("");
   const [addOptionOpen, setAddOptionOpen] = useState(false);
   const [newOptionLabel, setNewOptionLabel] = useState("");
   const [newOptionFormId, setNewOptionFormId] = useState("");
@@ -171,6 +192,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
     setDraftOptions([...(column.component!.options ?? [])]);
     setDraftDataSourceFormId(column.component!.dataSourceFormId ?? "");
     setDraftDataSourceFieldId(column.component!.dataSourceFieldId ?? "");
+    setDraftUrl(column.component!.url ?? "");
     setEditOpen(true);
   };
 
@@ -181,6 +203,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
         options: draftOptions,
         dataSourceFormId: draftDataSourceFormId || undefined,
         dataSourceFieldId: draftDataSourceFieldId || undefined,
+        url: draftUrl || undefined,
       });
     setEditOpen(false);
   };
@@ -293,6 +316,17 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
             }}
             sx={{ mt: 1 }}
           />
+          {column.component?.type === "image" && (
+            <TextField
+              fullWidth
+              size="small"
+              label="URL da imagem"
+              placeholder="https://..."
+              value={draftUrl}
+              onChange={(e) => setDraftUrl(e.target.value)}
+              sx={{ mt: 2 }}
+            />
+          )}
           {isSelect && (
             <>
               <Divider sx={{ my: 2 }} />
@@ -504,6 +538,10 @@ function RowCard({ row }: RowCardProps) {
     (s) => s.setSelectedComponent,
   );
   const addColumn = useFormBuilderStore((s) => s.addColumn);
+  const removeRow = useFormBuilderStore((s) => s.removeRow);
+  const removeColumn = useFormBuilderStore((s) => s.removeColumn);
+
+  const activeStepId = useFormBuilderStore((s) => s.activeStepId);
 
   return (
     <Box
@@ -514,17 +552,67 @@ function RowCard({ row }: RowCardProps) {
         borderColor: "divider",
         borderRadius: 2,
         bgcolor: "background.paper",
+        position: "relative",
+        "&:hover .row-actions": { opacity: 1 },
       }}
     >
+      <Box
+        className="row-actions"
+        sx={{
+          position: "absolute",
+          top: 4,
+          right: 4,
+          opacity: 0,
+          transition: "opacity 0.15s",
+          display: "flex",
+          gap: 0.5,
+          zIndex: 1,
+        }}
+      >
+        <Tooltip title="Remover linha">
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => removeRow(activeStepId, row.id)}
+          >
+            <DeleteOutline fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
       <Box sx={{ display: "flex", gap: 1, alignItems: "stretch" }}>
         {row.columns.map((col) => (
-          <ColumnZone
-            key={col.id}
-            column={col}
-            rowId={row.id}
-            isSelected={col.component?.id === selectedComponentId}
-            onSelect={setSelectedComponent}
-          />
+          <Box key={col.id} sx={{ flex: 1, position: "relative" }}>
+            {row.columns.length > 1 && (
+              <Box
+                className="row-actions"
+                sx={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  opacity: 0,
+                  transition: "opacity 0.15s",
+                  zIndex: 2,
+                }}
+              >
+                <Tooltip title="Remover coluna">
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => removeColumn(row.id, col.id)}
+                    sx={{ bgcolor: "background.paper", width: 18, height: 18 }}
+                  >
+                    <DeleteOutline sx={{ fontSize: 12 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
+            <ColumnZone
+              column={col}
+              rowId={row.id}
+              isSelected={col.component?.id === selectedComponentId}
+              onSelect={setSelectedComponent}
+            />
+          </Box>
         ))}
         {row.columns.length < 3 && (
           <Tooltip title="Adicionar coluna">
