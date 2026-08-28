@@ -13,9 +13,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   TextField,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import proteusIcon from "../../../assets/proteus.png";
 import { defaultLabel, type ComponentType } from "../infrastructure/formBuilderStore";
 import { useAppServices } from "../../../shared/application/AppServicesContext";
 import type { FormTemplate } from "../application/formTemplates";
@@ -23,6 +25,7 @@ import { ComponentPalette } from "./components/ComponentPalette";
 import { FormCanvas } from "./components/FormCanvas";
 import { FlowPanel } from "./components/FlowPanel";
 import { PropertyEditor } from "./components/PropertyEditor";
+import { FormAssistantPanel } from "./components/FormAssistantPanel";
 
 export function CreateFormPage() {
   const navigate = useNavigate();
@@ -47,6 +50,7 @@ export function CreateFormPage() {
   const [formName, setFormName] = useState(existingCategory?.name ?? "");
   const [draggingType, setDraggingType] = useState<ComponentType | null>(null);
   const [draggingTemplate, setDraggingTemplate] = useState<FormTemplate | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
 
   const handleSaveClick = () => {
     if (isEdit) {
@@ -131,8 +135,42 @@ export function CreateFormPage() {
       >
         <ComponentPalette />
         <FormCanvas />
-        {selectedComponentId ? <PropertyEditor /> : <FlowPanel />}
+        {assistantOpen ? (
+          <FormAssistantPanel onClose={() => setAssistantOpen(false)} />
+        ) : selectedComponentId ? (
+          <PropertyEditor />
+        ) : (
+          <FlowPanel />
+        )}
       </Box>
+
+      {!assistantOpen && (
+        <IconButton
+          onClick={() => setAssistantOpen(true)}
+          aria-label="Abrir assistente de formulário"
+          sx={{
+            position: "fixed",
+            right: { xs: 16, sm: 24 },
+            bottom: { xs: 16, sm: 24 },
+            zIndex: 1200,
+            width: 64,
+            height: 64,
+            bgcolor: "primary.main",
+            border: "3px solid",
+            borderColor: "background.paper",
+            boxShadow: 4,
+            overflow: "hidden",
+            "&:hover": { bgcolor: "primary.dark" },
+          }}
+        >
+          <Box
+            component="img"
+            src={proteusIcon}
+            alt=""
+            sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </IconButton>
+      )}
 
       {/* Drag ghost */}
       <DragOverlay>

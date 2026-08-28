@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Box,
   Button,
-  ButtonBase,
   Dialog,
   DialogActions,
   DialogContent,
@@ -54,8 +53,15 @@ export function FormsPage() {
         {categories.map((cat) => (
           <Paper
             key={cat.id}
-            component={ButtonBase}
             onClick={() => navigate(cat.route ?? `/forms/${cat.id}`)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                navigate(cat.route ?? `/forms/${cat.id}`);
+              }
+            }}
+            role="button"
+            tabIndex={0}
             sx={{
               width: 160,
               height: 160,
@@ -111,8 +117,15 @@ export function FormsPage() {
         ))}
         {isAdmin && (
           <Paper
-            component={ButtonBase}
             onClick={() => navigate("/forms/new")}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                navigate("/forms/new");
+              }
+            }}
+            role="button"
+            tabIndex={0}
             sx={{
               width: 160,
               height: 160,
