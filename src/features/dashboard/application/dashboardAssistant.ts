@@ -30,7 +30,15 @@ export async function requestDashboardInsight(prompt: string, context: Dashboard
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt, context }),
   });
-  const payload = await response.json() as { error?: string; result?: unknown };
+  const rawPayload = await response.text();
+  let payload: { error?: string; result?: unknown };
+  try {
+    payload = JSON.parse(rawPayload) as { error?: string; result?: unknown };
+  } catch {
+    throw new Error(rawPayload.trim()
+      ? `O servidor retornou uma resposta inválida (${response.status}).`
+      : `O servidor não retornou uma resposta (${response.status}). Reinicie o servidor e tente novamente.`);
+  }
   if (!response.ok) throw new Error(payload.error ?? "Não foi possível analisar o dashboard.");
   return dashboardResultSchema.parse(payload.result);
 }
