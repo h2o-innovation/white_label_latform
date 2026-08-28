@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppServices } from "../../../shared/application/AppServicesContext";
 import logo from "../../../assets/logo.png";
 import logoDark from "../../../assets/logo_dark.png";
+import { APP_VERSION } from "../../../shared/constants/appInfo";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -60,6 +61,9 @@ export function LoginPage() {
             />
             <Typography variant="h6" fontWeight={700}>
               Entrar na plataforma
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Versão {APP_VERSION}
             </Typography>
             {error && (
               <Alert severity="error" sx={{ width: "100%" }}>
