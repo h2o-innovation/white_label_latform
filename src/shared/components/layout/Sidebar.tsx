@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import CategoryOutlined from "@mui/icons-material/CategoryOutlined";
+import HomeOutlined from "@mui/icons-material/HomeOutlined";
 import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import logo from "../../../assets/logo.png";
@@ -47,6 +48,17 @@ export function Sidebar() {
         />
       </Toolbar>
       <List sx={{ px: 1.5, pt: 2 }}>
+        <ListItemButton
+          component={NavLink}
+          to="/dashboard"
+          selected={location.pathname === "/dashboard" || location.pathname === "/"}
+          sx={{ borderRadius: 2, mb: 0.5 }}
+        >
+          <ListItemIcon>
+            <HomeOutlined />
+          </ListItemIcon>
+          <ListItemText primary="Início" />
+        </ListItemButton>
         <ListItemButton
           component={NavLink}
           to="/forms"
