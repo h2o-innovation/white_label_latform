@@ -23,6 +23,7 @@ import { ComponentPalette } from "./components/ComponentPalette";
 import { FormCanvas } from "./components/FormCanvas";
 import { FlowPanel } from "./components/FlowPanel";
 import { PropertyEditor } from "./components/PropertyEditor";
+import { FormAssistantPanel } from "./components/FormAssistantPanel";
 
 export function CreateFormPage() {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export function CreateFormPage() {
   const [formName, setFormName] = useState(existingCategory?.name ?? "");
   const [draggingType, setDraggingType] = useState<ComponentType | null>(null);
   const [draggingTemplate, setDraggingTemplate] = useState<FormTemplate | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
 
   const handleSaveClick = () => {
     if (isEdit) {
@@ -119,6 +121,12 @@ export function CreateFormPage() {
         >
           Salvar formulário
         </Button>
+        <Button
+          variant={assistantOpen ? "outlined" : "text"}
+          onClick={() => setAssistantOpen((open) => !open)}
+        >
+          ✨ Assistente
+        </Button>
       </Box>
 
       {/* 3-panel builder */}
@@ -131,7 +139,13 @@ export function CreateFormPage() {
       >
         <ComponentPalette />
         <FormCanvas />
-        {selectedComponentId ? <PropertyEditor /> : <FlowPanel />}
+        {assistantOpen ? (
+          <FormAssistantPanel onClose={() => setAssistantOpen(false)} />
+        ) : selectedComponentId ? (
+          <PropertyEditor />
+        ) : (
+          <FlowPanel />
+        )}
       </Box>
 
       {/* Drag ghost */}
