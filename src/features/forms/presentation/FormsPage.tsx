@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useFormsStore, type FormCategory } from "../infrastructure/formsStore";
 import { useAuthStore } from "../../../shared/stores/authStore";
 import { usePermissionsStore } from "../../categories/infrastructure/permissionsStore";
+import { useFormEntriesStore } from "../infrastructure/formEntriesStore";
 
 export function FormsPage() {
   const allCategories = useFormsStore((state) => state.categories);
@@ -26,6 +27,7 @@ export function FormsPage() {
   const removeCategory = useFormsStore((s) => s.removeCategory);
   const currentUser = useAuthStore((s) => s.currentUser);
   const getUserIds = usePermissionsStore((s) => s.getUserIds);
+  const allEntries = useFormEntriesStore((s) => s.entries);
   const navigate = useNavigate();
   const [editTarget, setEditTarget] = useState<FormCategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FormCategory | null>(null);
@@ -75,6 +77,10 @@ export function FormsPage() {
           >
             <Typography variant="subtitle1" fontWeight={600}>
               {cat.name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {(allEntries[cat.id] ?? []).length}{" "}
+              {(allEntries[cat.id] ?? []).length === 1 ? "entrada" : "entradas"}
             </Typography>
             {isAdmin && (
               <Box
