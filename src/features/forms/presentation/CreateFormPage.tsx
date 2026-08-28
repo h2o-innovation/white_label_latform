@@ -18,6 +18,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { defaultLabel, type ComponentType } from "../infrastructure/formBuilderStore";
 import { useAppServices } from "../../../shared/application/AppServicesContext";
+import type { FormTemplate } from "../application/formTemplates";
 import { ComponentPalette } from "./components/ComponentPalette";
 import { FormCanvas } from "./components/FormCanvas";
 import { FlowPanel } from "./components/FlowPanel";
@@ -31,7 +32,7 @@ export function CreateFormPage() {
   const { forms, formBuilder } = useAppServices();
   const { addCategory, updateCategory } = forms;
   const existingCategory = forms.categories.find((c) => c.id === categoryId);
-  const { setComponent, selectedComponentId, steps, reset, loadSteps } = formBuilder;
+  const { setComponent, selectedComponentId, steps, reset, loadSteps, insertSteps } = formBuilder;
 
   useEffect(() => {
     if (isEdit && existingCategory?.steps?.length) {
@@ -44,6 +45,7 @@ export function CreateFormPage() {
   const [namingOpen, setNamingOpen] = useState(false);
   const [formName, setFormName] = useState(existingCategory?.name ?? "");
   const [draggingType, setDraggingType] = useState<ComponentType | null>(null);
+  const [draggingTemplate, setDraggingTemplate] = useState<FormTemplate | null>(null);
 
   const handleSaveClick = () => {
     if (isEdit) {
@@ -58,16 +60,26 @@ export function CreateFormPage() {
     if (event.active.data.current?.source === "palette") {
       setDraggingType(event.active.data.current.componentType);
     }
+    if (event.active.data.current?.source === "template") {
+      setDraggingTemplate(event.active.data.current.template);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     setDraggingType(null);
+    setDraggingTemplate(null);
     const { active, over } = event;
     if (!over) return;
     const src = active.data.current;
     const dst = over.data.current;
     if (src?.source === "palette" && dst?.target === "column") {
       setComponent(dst.rowId, dst.columnId, src.componentType);
+    }
+    if (
+      src?.source === "template" &&
+      (dst?.target === "canvas" || dst?.target === "column")
+    ) {
+      insertSteps(src.template.steps);
     }
   };
 
@@ -126,6 +138,9 @@ export function CreateFormPage() {
             color="primary"
             sx={{ cursor: "grabbing" }}
           />
+        )}
+        {draggingTemplate && (
+          <Chip label={draggingTemplate.name} size="small" color="primary" sx={{ cursor: "grabbing" }} />
         )}
       </DragOverlay>
 
