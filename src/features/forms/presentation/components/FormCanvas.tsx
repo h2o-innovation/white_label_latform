@@ -504,6 +504,10 @@ function RowCard({ row }: RowCardProps) {
     (s) => s.setSelectedComponent,
   );
   const addColumn = useFormBuilderStore((s) => s.addColumn);
+  const removeRow = useFormBuilderStore((s) => s.removeRow);
+  const removeColumn = useFormBuilderStore((s) => s.removeColumn);
+
+  const activeStepId = useFormBuilderStore((s) => s.activeStepId);
 
   return (
     <Box
@@ -514,25 +518,48 @@ function RowCard({ row }: RowCardProps) {
         borderColor: "divider",
         borderRadius: 2,
         bgcolor: "background.paper",
+        position: "relative",
+        "&:hover .row-actions": { opacity: 1 },
       }}
     >
+      <Box
+        className="row-actions"
+        sx={{ position: "absolute", top: 4, right: 4, opacity: 0, transition: "opacity 0.15s", display: "flex", gap: 0.5, zIndex: 1 }}
+      >
+        <Tooltip title="Remover linha">
+          <IconButton size="small" color="error" onClick={() => removeRow(activeStepId, row.id)}>
+            <DeleteOutline fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
       <Box sx={{ display: "flex", gap: 1, alignItems: "stretch" }}>
         {row.columns.map((col) => (
-          <ColumnZone
-            key={col.id}
-            column={col}
-            rowId={row.id}
-            isSelected={col.component?.id === selectedComponentId}
-            onSelect={setSelectedComponent}
-          />
+          <Box key={col.id} sx={{ flex: 1, position: "relative" }}>
+            {row.columns.length > 1 && (
+              <Box
+                className="row-actions"
+                sx={{ position: "absolute", top: -4, right: -4, opacity: 0, transition: "opacity 0.15s", zIndex: 2 }}
+              >
+                <Tooltip title="Remover coluna">
+                  <IconButton size="small" color="error" onClick={() => removeColumn(row.id, col.id)}
+                    sx={{ bgcolor: "background.paper", width: 18, height: 18 }}
+                  >
+                    <DeleteOutline sx={{ fontSize: 12 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
+            <ColumnZone
+              column={col}
+              rowId={row.id}
+              isSelected={col.component?.id === selectedComponentId}
+              onSelect={setSelectedComponent}
+            />
+          </Box>
         ))}
         {row.columns.length < 3 && (
           <Tooltip title="Adicionar coluna">
-            <IconButton
-              size="small"
-              onClick={() => addColumn(row.id)}
-              sx={{ alignSelf: "center" }}
-            >
+            <IconButton size="small" onClick={() => addColumn(row.id)} sx={{ alignSelf: "center" }}>
               <ViewColumnOutlined fontSize="small" />
             </IconButton>
           </Tooltip>

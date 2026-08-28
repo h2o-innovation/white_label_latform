@@ -81,7 +81,9 @@ interface FormBuilderStore {
   addStep: () => void;
   renameStep: (id: string, name: string) => void;
   addRow: (stepId: string) => void;
+  removeRow: (stepId: string, rowId: string) => void;
   addColumn: (rowId: string) => void;
+  removeColumn: (rowId: string, columnId: string) => void;
   setComponent: (rowId: string, columnId: string, type: ComponentType) => void;
   updateComponent: (id: string, patch: Partial<FormComponent>) => void;
   removeComponent: (rowId: string, columnId: string) => void;
@@ -120,6 +122,15 @@ export const useFormBuilderStore = create<FormBuilderStore>((set, get) => {
         ),
       })),
 
+    removeRow: (stepId, rowId) =>
+      set((s) => ({
+        steps: s.steps.map((st) =>
+          st.id === stepId
+            ? { ...st, rows: st.rows.filter((r) => r.id !== rowId) }
+            : st,
+        ),
+      })),
+
     addColumn: (rowId) =>
       set((s) => ({
         steps: s.steps.map((st) => ({
@@ -127,6 +138,18 @@ export const useFormBuilderStore = create<FormBuilderStore>((set, get) => {
           rows: st.rows.map((r) =>
             r.id === rowId && r.columns.length < 3
               ? { ...r, columns: [...r.columns, makeColumn()] }
+              : r,
+          ),
+        })),
+      })),
+
+    removeColumn: (rowId, columnId) =>
+      set((s) => ({
+        steps: s.steps.map((st) => ({
+          ...st,
+          rows: st.rows.map((r) =>
+            r.id === rowId
+              ? { ...r, columns: r.columns.filter((c) => c.id !== columnId) }
               : r,
           ),
         })),
