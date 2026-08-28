@@ -30,6 +30,7 @@ export interface FormComponent {
   options: SelectOption[];
   dataSourceFormId?: string;
   dataSourceFieldId?: string;
+  url?: string;
 }
 
 export interface FormColumn {

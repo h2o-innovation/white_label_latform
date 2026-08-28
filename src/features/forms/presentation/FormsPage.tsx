@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { useNavigate } from "react-router-dom";
 import { useFormsStore, type FormCategory } from "../infrastructure/formsStore";
@@ -22,10 +23,12 @@ import { usePermissionsStore } from "../../categories/infrastructure/permissions
 export function FormsPage() {
   const allCategories = useFormsStore((state) => state.categories);
   const renameCategory = useFormsStore((s) => s.renameCategory);
+  const removeCategory = useFormsStore((s) => s.removeCategory);
   const currentUser = useAuthStore((s) => s.currentUser);
   const getUserIds = usePermissionsStore((s) => s.getUserIds);
   const navigate = useNavigate();
   const [editTarget, setEditTarget] = useState<FormCategory | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FormCategory | null>(null);
   const [draftName, setDraftName] = useState("");
 
   const isAdmin = currentUser?.role === "admin";
@@ -74,20 +77,14 @@ export function FormsPage() {
               {cat.name}
             </Typography>
             {isAdmin && (
-              <IconButton
-                className="edit-btn"
-                size="small"
-                onClick={(e) => openEdit(e, cat)}
-                sx={{
-                  position: "absolute",
-                  top: 6,
-                  right: 6,
-                  opacity: 0,
-                  transition: "opacity 0.15s",
-                }}
-              >
-                <EditOutlined fontSize="small" />
-              </IconButton>
+              <Box className="edit-btn" sx={{ position: "absolute", top: 6, right: 6, opacity: 0, transition: "opacity 0.15s", display: "flex", gap: 0.5 }}>
+                <IconButton size="small" onClick={(e) => openEdit(e, cat)}>
+                  <EditOutlined fontSize="small" />
+                </IconButton>
+                <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); setDeleteTarget(cat); }}>
+                  <DeleteOutline fontSize="small" />
+                </IconButton>
+              </Box>
             )}
           </Paper>
         ))}
@@ -141,6 +138,17 @@ export function FormsPage() {
             disabled={!draftName.trim()}
           >
             Salvar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} maxWidth="xs">
+        <DialogTitle>Excluir formulário?</DialogTitle>
+        <DialogContent>O formulário "<strong>{deleteTarget?.name}</strong>" e todas as suas entradas serão removidos permanentemente.</DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteTarget(null)}>Cancelar</Button>
+          <Button color="error" variant="contained" onClick={() => { if (deleteTarget) removeCategory(deleteTarget.id); setDeleteTarget(null); }}>
+            Excluir
           </Button>
         </DialogActions>
       </Dialog>

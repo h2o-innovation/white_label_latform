@@ -90,14 +90,21 @@ function ComponentPreview({ component }: { component: FormComponent }) {
             border: "1px dashed",
             borderColor: "text.disabled",
             borderRadius: 1,
-            p: 2,
+            overflow: "hidden",
             textAlign: "center",
           }}
         >
-          <ImageOutlined sx={{ color: "text.disabled", fontSize: 32 }} />
-          <Typography variant="caption" display="block" color="text.disabled">
-            {component.label}
-          </Typography>
+          {component.url ? (
+            <Box component="img" src={component.url} alt={component.label}
+              sx={{ width: "100%", maxHeight: 120, objectFit: "cover", display: "block" }} />
+          ) : (
+            <Box sx={{ p: 2 }}>
+              <ImageOutlined sx={{ color: "text.disabled", fontSize: 32 }} />
+              <Typography variant="caption" display="block" color="text.disabled">
+                {component.label}
+              </Typography>
+            </Box>
+          )}
         </Box>
       );
     case "button":
@@ -130,6 +137,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const [draftOptions, setDraftOptions] = useState<SelectOption[]>([]);
   const [draftDataSourceFormId, setDraftDataSourceFormId] = useState("");
   const [draftDataSourceFieldId, setDraftDataSourceFieldId] = useState("");
+  const [draftUrl, setDraftUrl] = useState("");
   const [addOptionOpen, setAddOptionOpen] = useState(false);
   const [newOptionLabel, setNewOptionLabel] = useState("");
   const [newOptionFormId, setNewOptionFormId] = useState("");
@@ -171,6 +179,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
     setDraftOptions([...(column.component!.options ?? [])]);
     setDraftDataSourceFormId(column.component!.dataSourceFormId ?? "");
     setDraftDataSourceFieldId(column.component!.dataSourceFieldId ?? "");
+    setDraftUrl(column.component!.url ?? "");
     setEditOpen(true);
   };
 
@@ -181,6 +190,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
         options: draftOptions,
         dataSourceFormId: draftDataSourceFormId || undefined,
         dataSourceFieldId: draftDataSourceFieldId || undefined,
+        url: draftUrl || undefined,
       });
     setEditOpen(false);
   };
@@ -293,6 +303,14 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
             }}
             sx={{ mt: 1 }}
           />
+          {column.component?.type === "image" && (
+            <TextField
+              fullWidth size="small" label="URL da imagem" placeholder="https://..."
+              value={draftUrl}
+              onChange={(e) => setDraftUrl(e.target.value)}
+              sx={{ mt: 2 }}
+            />
+          )}
           {isSelect && (
             <>
               <Divider sx={{ my: 2 }} />

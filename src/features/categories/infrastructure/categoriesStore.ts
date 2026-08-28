@@ -11,6 +11,7 @@ interface CategoriesStore {
   groups: FormGroup[];
   addGroup: (name: string, formIds: string[]) => void;
   updateGroup: (id: string, name: string, formIds: string[]) => void;
+  removeGroup: (id: string) => void;
 }
 
 export const useCategoriesStore = create<CategoriesStore>()(
@@ -27,6 +28,8 @@ export const useCategoriesStore = create<CategoriesStore>()(
             g.id === id ? { ...g, name, formIds } : g,
           ),
         })),
+      removeGroup: (id) =>
+        set((s) => ({ groups: s.groups.filter((g) => g.id !== id) })),
     }),
     { name: "categories-store" },
   ),

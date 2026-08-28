@@ -121,6 +121,20 @@ function DynamicField({
         />
       );
     default:
+      if (component.type === "image") {
+        return (
+          <Box sx={{ borderRadius: 1, overflow: "hidden", border: "1px solid", borderColor: "divider" }}>
+            {component.url ? (
+              <Box component="img" src={component.url} alt={component.label}
+                sx={{ width: "100%", maxHeight: 200, objectFit: "cover", display: "block" }} />
+            ) : (
+              <Box sx={{ p: 3, textAlign: "center", color: "text.disabled" }}>
+                <Typography variant="caption">{component.label}</Typography>
+              </Box>
+            )}
+          </Box>
+        );
+      }
       return null;
   }
 }
@@ -156,7 +170,7 @@ function StepFields({
         .map((c) => c.component)
         .filter(
           (c): c is FormComponent =>
-            c !== null && c.type !== "image" && c.type !== "button",
+            c !== null && c.type !== "button",
         ),
     }))
     .filter((r) => r.fields.length > 0);
