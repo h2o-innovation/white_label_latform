@@ -150,6 +150,8 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const [draftOptions, setDraftOptions] = useState<SelectOption[]>([]);
   const [draftDataSourceFormId, setDraftDataSourceFormId] = useState("");
   const [draftDataSourceFieldId, setDraftDataSourceFieldId] = useState("");
+  const [draftDataSourceImageFieldId, setDraftDataSourceImageFieldId] = useState("");
+  const [draftDataSourceLabelFieldId, setDraftDataSourceLabelFieldId] = useState("");
   const [draftUrl, setDraftUrl] = useState("");
   const [addOptionOpen, setAddOptionOpen] = useState(false);
   const [newOptionLabel, setNewOptionLabel] = useState("");
@@ -167,6 +169,13 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
           (c): c is FormComponent =>
             c !== null && c.type !== "image" && c.type !== "button",
         ),
+    ),
+  );
+  const dataSourceImageFields = dataSourceFormSteps.flatMap((step) =>
+    step.rows.flatMap((row) =>
+      row.columns
+        .map((c) => c.component)
+        .filter((c): c is FormComponent => c !== null && c.type === "image"),
     ),
   );
   const linkedFormSteps =
@@ -192,6 +201,8 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
     setDraftOptions([...(column.component!.options ?? [])]);
     setDraftDataSourceFormId(column.component!.dataSourceFormId ?? "");
     setDraftDataSourceFieldId(column.component!.dataSourceFieldId ?? "");
+    setDraftDataSourceImageFieldId(column.component!.dataSourceImageFieldId ?? "");
+    setDraftDataSourceLabelFieldId(column.component!.dataSourceLabelFieldId ?? "");
     setDraftUrl(column.component!.url ?? "");
     setEditOpen(true);
   };
@@ -203,6 +214,8 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
         options: draftOptions,
         dataSourceFormId: draftDataSourceFormId || undefined,
         dataSourceFieldId: draftDataSourceFieldId || undefined,
+        dataSourceImageFieldId: draftDataSourceImageFieldId || undefined,
+        dataSourceLabelFieldId: draftDataSourceLabelFieldId || undefined,
         url: draftUrl || undefined,
       });
     setEditOpen(false);
@@ -347,6 +360,8 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
                   onChange={(e) => {
                     setDraftDataSourceFormId(e.target.value as string);
                     setDraftDataSourceFieldId("");
+                    setDraftDataSourceImageFieldId("");
+                    setDraftDataSourceLabelFieldId("");
                   }}
                 >
                   <MenuItem value="">
@@ -361,9 +376,9 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
               </FormControl>
               {draftDataSourceFormId && (
                 <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
-                  <InputLabel>Campo do formulário</InputLabel>
-                  <Select
-                    label="Campo do formulário"
+                    <InputLabel>Campo de valor</InputLabel>
+                    <Select
+                    label="Campo de valor"
                     value={draftDataSourceFieldId}
                     onChange={(e) =>
                       setDraftDataSourceFieldId(e.target.value as string)
@@ -376,6 +391,36 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
                       <MenuItem key={f.id} value={f.id}>
                         {f.label}
                       </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+              {draftDataSourceFormId && (
+                <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
+                  <InputLabel>Campo de título</InputLabel>
+                  <Select
+                    label="Campo de título"
+                    value={draftDataSourceLabelFieldId}
+                    onChange={(e) => setDraftDataSourceLabelFieldId(e.target.value as string)}
+                  >
+                    <MenuItem value=""><em>Usar campo de valor</em></MenuItem>
+                    {dataSourceFields.map((f) => (
+                      <MenuItem key={f.id} value={f.id}>{f.label}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+              {draftDataSourceFormId && (
+                <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
+                  <InputLabel>Campo de imagem (opcional)</InputLabel>
+                  <Select
+                    label="Campo de imagem (opcional)"
+                    value={draftDataSourceImageFieldId}
+                    onChange={(e) => setDraftDataSourceImageFieldId(e.target.value as string)}
+                  >
+                    <MenuItem value=""><em>Sem imagem</em></MenuItem>
+                    {dataSourceImageFields.map((f) => (
+                      <MenuItem key={f.id} value={f.id}>{f.label}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
