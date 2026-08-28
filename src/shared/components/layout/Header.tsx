@@ -13,6 +13,7 @@ import { useLocation, useMatch, useNavigate } from "react-router-dom";
 import { useAppServices } from "../../application/AppServicesContext";
 
 const titles: Record<string, string> = {
+  "/dashboard": "Início",
   "/clients": "Clientes",
   "/categories": "Categorias",
   "/forms": "Formulários",

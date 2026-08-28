@@ -9,6 +9,7 @@ import { CreateFormPage } from "./features/forms/presentation/CreateFormPage";
 import { FormEntriesPage } from "./features/forms/presentation/FormEntriesPage";
 import { FormsPage } from "./features/forms/presentation/FormsPage";
 import { SettingsPage } from "./features/settings/presentation/SettingsPage";
+import { DashboardPage } from "./features/dashboard/presentation/DashboardPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -16,7 +17,8 @@ export const router = createBrowserRouter([
     path: "/",
     element: <AppLayout />,
     children: [
-      { index: true, element: <Navigate to="/forms" replace /> },
+      { index: true, element: <Navigate to="/dashboard" replace /> },
+      { path: "dashboard", element: <DashboardPage /> },
       { path: "clients", element: <ClientsPage /> },
       { path: "categories", element: <CategoriesPage /> },
       { path: "categories/:groupId", element: <CategoryDetailPage /> },
