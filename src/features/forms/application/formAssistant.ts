@@ -54,7 +54,15 @@ export async function requestFormPlan(
     }),
   });
 
-  const payload = (await response.json()) as { error?: string; plan?: unknown };
+  const rawPayload = await response.text();
+  let payload: { error?: string; plan?: unknown };
+  try {
+    payload = JSON.parse(rawPayload) as { error?: string; plan?: unknown };
+  } catch {
+    throw new Error(rawPayload.trim()
+      ? `O servidor retornou uma resposta inválida (${response.status}).`
+      : `O servidor não retornou uma resposta (${response.status}). Reinicie o servidor e tente novamente.`);
+  }
   if (!response.ok) throw new Error(payload.error ?? "Não foi possível gerar o formulário.");
   return formPlanSchema.parse(payload.plan);
 }

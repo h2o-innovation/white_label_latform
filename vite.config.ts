@@ -131,7 +131,7 @@ function formAssistantApi(apiKey: string, model: string, baseUrl: string): Plugi
             fetch: (url: string, options: { method: string; headers: Record<string, string>; body: string }) => Promise<{
               ok: boolean;
               status: number;
-              json: () => Promise<unknown>;
+              text: () => Promise<string>;
             }>;
           }).fetch;
           const instructions = `Você é o assistente do construtor de formulários desta aplicação.
@@ -173,11 +173,17 @@ ${JSON.stringify(input.currentSteps ?? [])}`;
             body: JSON.stringify(requestBody),
           });
 
-          const openAIPayload = (await openAIResponse.json()) as {
+          const rawOpenAIPayload = await openAIResponse.text();
+          let openAIPayload: {
             error?: { message?: string };
             output?: Array<{ type?: string; content?: Array<{ type?: string; text?: string }> }>;
             choices?: Array<{ message?: { content?: string | null } }>;
           };
+          try {
+            openAIPayload = JSON.parse(rawOpenAIPayload) as typeof openAIPayload;
+          } catch {
+            throw new Error(`A API de IA retornou uma resposta vazia ou inválida (HTTP ${openAIResponse.status}).`);
+          }
           if (!openAIResponse.ok) {
             response.statusCode = openAIResponse.status;
             response.setHeader("Content-Type", "application/json");
@@ -245,7 +251,7 @@ Contexto atual do dashboard:
 ${JSON.stringify(input.context ?? {})}`;
           const endpoint = baseUrl.endsWith("/v1") ? `${baseUrl}/responses` : `${baseUrl}/v1/responses`;
           const openAIResponse = await (globalThis as unknown as {
-            fetch: (url: string, options: { method: string; headers: Record<string, string>; body: string }) => Promise<{ ok: boolean; status: number; json: () => Promise<unknown> }>;
+            fetch: (url: string, options: { method: string; headers: Record<string, string>; body: string }) => Promise<{ ok: boolean; status: number; text: () => Promise<string> }>;
           }).fetch(endpoint, {
             method: "POST",
             headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -257,11 +263,17 @@ ${JSON.stringify(input.context ?? {})}`;
               text: { format: { type: "json_schema", name: "dashboard_answer", strict: true, schema: dashboardAssistantJsonSchema } },
             }),
           });
-          const payload = await openAIResponse.json() as {
+          const rawPayload = await openAIResponse.text();
+          let payload: {
             error?: { message?: string };
             output?: Array<{ type?: string; content?: Array<{ type?: string; text?: string }> }>;
             choices?: Array<{ message?: { content?: string | null } }>;
           };
+          try {
+            payload = JSON.parse(rawPayload) as typeof payload;
+          } catch {
+            throw new Error(`A API de IA retornou uma resposta vazia ou inválida (HTTP ${openAIResponse.status}).`);
+          }
           if (!openAIResponse.ok) {
             response.statusCode = openAIResponse.status;
             response.setHeader("Content-Type", "application/json");
