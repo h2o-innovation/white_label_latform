@@ -10,10 +10,7 @@ import {
 import AddOutlined from "@mui/icons-material/AddOutlined";
 import LogoutOutlined from "@mui/icons-material/LogoutOutlined";
 import { useLocation, useMatch, useNavigate } from "react-router-dom";
-import { useModalStore } from "../../stores/modalStore";
-import { useFormsStore } from "../../../features/forms/infrastructure/formsStore";
-import { useCategoriesStore } from "../../../features/categories/infrastructure/categoriesStore";
-import { useAuthStore } from "../../stores/authStore";
+import { useAppServices } from "../../application/AppServicesContext";
 
 const titles: Record<string, string> = {
   "/clients": "Clientes",
@@ -30,12 +27,13 @@ export function Header() {
   const formsMatch = useMatch("/forms/:categoryId");
   const formsEditMatch = useMatch("/forms/edit/:categoryId");
   const categoriesMatch = useMatch("/categories/:groupId");
-  const formCategories = useFormsStore((s) => s.categories);
-  const groups = useCategoriesStore((s) => s.groups);
-  const openModal = useModalStore((state) => state.openModal);
+  const { auth, modal, forms, categories } = useAppServices();
+  const formCategories = forms.categories;
+  const groups = categories.groups;
+  const openModal = modal.openModal;
   const isClientsPage = location.pathname === "/clients";
-  const currentUser = useAuthStore((s) => s.currentUser);
-  const logout = useAuthStore((s) => s.logout);
+  const currentUser = auth.currentUser;
+  const logout = auth.logout;
   const navigate = useNavigate();
 
   const handleLogout = () => {

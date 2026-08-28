@@ -12,13 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteSweepOutlined from "@mui/icons-material/DeleteSweepOutlined";
-import { useClientsStore } from "../../clients/infrastructure/clientsStore";
-import { useThemeStore } from "../../../shared/stores/themeStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 
 export function SettingsPage() {
-  const clearAll = useClientsStore((state) => state.clearAll);
-  const mode = useThemeStore((s) => s.mode);
-  const setMode = useThemeStore((s) => s.setMode);
+  const { clients, theme } = useAppServices();
+  const clearAll = clients.clearAll;
+  const mode = theme.mode;
+  const setMode = theme.setMode;
   const [confirmOpen, setConfirmOpen] = useState(false);
   return (
     <Stack spacing={3}>

@@ -31,8 +31,7 @@ import type {
   FormRow,
   SelectOption,
 } from "../../infrastructure/formBuilderStore";
-import { useFormBuilderStore } from "../../infrastructure/formBuilderStore";
-import { useFormsStore } from "../../infrastructure/formsStore";
+import { useAppServices } from "../../../../shared/application/AppServicesContext";
 
 function ComponentPreview({ component }: { component: FormComponent }) {
   switch (component.type) {
@@ -143,8 +142,9 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
     id: `col-${column.id}`,
     data: { target: "column", rowId, columnId: column.id },
   });
-  const updateComponent = useFormBuilderStore((s) => s.updateComponent);
-  const removeComponent = useFormBuilderStore((s) => s.removeComponent);
+  const { formBuilder, forms } = useAppServices();
+  const updateComponent = formBuilder.updateComponent;
+  const removeComponent = formBuilder.removeComponent;
   const [editOpen, setEditOpen] = useState(false);
   const [draftLabel, setDraftLabel] = useState("");
   const [draftOptions, setDraftOptions] = useState<SelectOption[]>([]);
@@ -156,7 +156,7 @@ function ColumnZone({ column, rowId, isSelected, onSelect }: ColumnZoneProps) {
   const [newOptionFormId, setNewOptionFormId] = useState("");
   const [newOptionFieldId, setNewOptionFieldId] = useState("");
 
-  const allForms = useFormsStore((s) => s.categories.filter((c) => !c.route));
+  const allForms = forms.categories.filter((c) => !c.route);
   const dataSourceFormSteps =
     allForms.find((f) => f.id === draftDataSourceFormId)?.steps ?? [];
   const dataSourceFields = dataSourceFormSteps.flatMap((step) =>
@@ -533,15 +533,8 @@ interface RowCardProps {
 }
 
 function RowCard({ row }: RowCardProps) {
-  const selectedComponentId = useFormBuilderStore((s) => s.selectedComponentId);
-  const setSelectedComponent = useFormBuilderStore(
-    (s) => s.setSelectedComponent,
-  );
-  const addColumn = useFormBuilderStore((s) => s.addColumn);
-  const removeRow = useFormBuilderStore((s) => s.removeRow);
-  const removeColumn = useFormBuilderStore((s) => s.removeColumn);
-
-  const activeStepId = useFormBuilderStore((s) => s.activeStepId);
+  const { formBuilder } = useAppServices();
+  const { selectedComponentId, setSelectedComponent, addColumn, removeRow, removeColumn, activeStepId } = formBuilder;
 
   return (
     <Box
@@ -631,13 +624,8 @@ function RowCard({ row }: RowCardProps) {
 }
 
 export function FormCanvas() {
-  const steps = useFormBuilderStore((s) => s.steps);
-  const activeStepId = useFormBuilderStore((s) => s.activeStepId);
-  const setActiveStep = useFormBuilderStore((s) => s.setActiveStep);
-  const addRow = useFormBuilderStore((s) => s.addRow);
-  const setSelectedComponent = useFormBuilderStore(
-    (s) => s.setSelectedComponent,
-  );
+  const { formBuilder } = useAppServices();
+  const { steps, activeStepId, setActiveStep, addRow, setSelectedComponent } = formBuilder;
 
   const activeStep = steps.find((s) => s.id === activeStepId);
 

@@ -16,16 +16,13 @@ import EditOutlined from "@mui/icons-material/EditOutlined";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import AddOutlined from "@mui/icons-material/AddOutlined";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { useFormsStore } from "../infrastructure/formsStore";
-import {
-  useFormEntriesStore,
-  type FormEntry,
-} from "../infrastructure/formEntriesStore";
+import type { FormEntry } from "../infrastructure/formEntriesStore";
 import type {
   FormComponent,
   FormStep,
 } from "../infrastructure/formBuilderStore";
 import { FormEntryModal } from "./components/FormEntryModal";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 
 function getAllFields(steps: FormStep[]): FormComponent[] {
   return steps.flatMap((step) =>
@@ -42,13 +39,10 @@ function getAllFields(steps: FormStep[]): FormComponent[] {
 
 export function FormEntriesPage() {
   const { categoryId = "" } = useParams<{ categoryId: string }>();
-  const category = useFormsStore((s) =>
-    s.categories.find((c) => c.id === categoryId),
-  );
-  const entries = useFormEntriesStore((s) => s.entries[categoryId] ?? []);
-  const addEntry = useFormEntriesStore((s) => s.addEntry);
-  const updateEntry = useFormEntriesStore((s) => s.updateEntry);
-  const deleteEntry = useFormEntriesStore((s) => s.deleteEntry);
+  const { forms, formEntries } = useAppServices();
+  const category = forms.categories.find((c) => c.id === categoryId);
+  const entries = formEntries.entries[categoryId] ?? [];
+  const { addEntry, updateEntry, deleteEntry } = formEntries;
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<FormEntry | null>(null);

@@ -14,16 +14,16 @@ import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
 import logo from "../../../assets/logo.png";
 import logoDark from "../../../assets/logo_dark.png";
 import { NavLink, useLocation } from "react-router-dom";
-import { useThemeStore } from "../../stores/themeStore";
-import { useAuthStore } from "../../stores/authStore";
+import { useAppServices } from "../../application/AppServicesContext";
 
 const drawerWidth = 240;
 
 export function Sidebar() {
   const location = useLocation();
-  const mode = useThemeStore((s) => s.mode);
+  const { theme, auth } = useAppServices();
+  const mode = theme.mode;
   const logoSrc = mode === "dark" ? logoDark : logo;
-  const isAdmin = useAuthStore((s) => s.currentUser?.role === "admin");
+  const isAdmin = auth.currentUser?.role === "admin";
   return (
     <Drawer
       variant="permanent"

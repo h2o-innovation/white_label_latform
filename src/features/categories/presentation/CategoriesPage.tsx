@@ -18,19 +18,14 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { useNavigate } from "react-router-dom";
-import { useCategoriesStore } from "../infrastructure/categoriesStore";
-import {
-  useFormsStore,
-  type FormCategory,
-} from "../../forms/infrastructure/formsStore";
+import type { FormCategory } from "../../forms/infrastructure/formsStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 
 export function CategoriesPage() {
-  const groups = useCategoriesStore((s) => s.groups);
-  const addGroup = useCategoriesStore((s) => s.addGroup);
-  const updateGroup = useCategoriesStore((s) => s.updateGroup);
-  const removeGroup = useCategoriesStore((s) => s.removeGroup);
+  const { categories, forms } = useAppServices();
+  const { groups, addGroup, updateGroup, removeGroup } = categories;
   const navigate = useNavigate();
-  const allForms = useFormsStore((s) => s.categories.filter((c) => !c.route));
+  const allForms = forms.categories.filter((c) => !c.route);
 
   const [open, setOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<(typeof groups)[0] | null>(null);

@@ -14,17 +14,15 @@ import {
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlined from "@mui/icons-material/VisibilityOffOutlined";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../../shared/stores/authStore";
-import { useUsersStore } from "../../users/infrastructure/usersStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 import logo from "../../../assets/logo.png";
 import logoDark from "../../../assets/logo_dark.png";
-import { useThemeStore } from "../../../shared/stores/themeStore";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
-  const users = useUsersStore((s) => s.users);
-  const mode = useThemeStore((s) => s.mode);
+  const { auth, users, theme } = useAppServices();
+  const login = auth.login;
+  const mode = theme.mode;
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +31,7 @@ export function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = login(identifier.trim(), password, users);
+    const ok = login(identifier.trim(), password, users.users);
     if (ok) {
       navigate("/", { replace: true });
     } else {

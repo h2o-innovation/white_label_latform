@@ -11,22 +11,16 @@ import {
 import AddOutlined from "@mui/icons-material/AddOutlined";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import CloseOutlined from "@mui/icons-material/CloseOutlined";
-import { useFormBuilderStore } from "../../infrastructure/formBuilderStore";
+import type { FormComponent } from "../../infrastructure/formBuilderStore";
+import { useAppServices } from "../../../../shared/application/AppServicesContext";
 
 export function PropertyEditor() {
-  const steps = useFormBuilderStore((s) => s.steps);
-  const selectedComponentId = useFormBuilderStore((s) => s.selectedComponentId);
-  const updateComponent = useFormBuilderStore((s) => s.updateComponent);
-  const removeComponent = useFormBuilderStore((s) => s.removeComponent);
-  const setSelectedComponent = useFormBuilderStore(
-    (s) => s.setSelectedComponent,
-  );
+  const { formBuilder } = useAppServices();
+  const { steps, selectedComponentId, updateComponent, removeComponent, setSelectedComponent } = formBuilder;
 
   // Find the component and its row/column context
   let found: {
-    component: ReturnType<
-      typeof useFormBuilderStore.getState
-    >["steps"][0]["rows"][0]["columns"][0]["component"];
+    component: FormComponent | null;
     rowId: string;
     columnId: string;
   } | null = null;

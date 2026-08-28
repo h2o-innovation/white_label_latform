@@ -16,18 +16,15 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import EditOutlined from "@mui/icons-material/EditOutlined";
 import { useNavigate } from "react-router-dom";
-import { useFormsStore, type FormCategory } from "../infrastructure/formsStore";
-import { useAuthStore } from "../../../shared/stores/authStore";
-import { usePermissionsStore } from "../../categories/infrastructure/permissionsStore";
-import { useFormEntriesStore } from "../infrastructure/formEntriesStore";
+import type { FormCategory } from "../infrastructure/formsStore";
+import { useAppServices } from "../../../shared/application/AppServicesContext";
 
 export function FormsPage() {
-  const allCategories = useFormsStore((state) => state.categories);
-  const renameCategory = useFormsStore((s) => s.renameCategory);
-  const removeCategory = useFormsStore((s) => s.removeCategory);
-  const currentUser = useAuthStore((s) => s.currentUser);
-  const getUserIds = usePermissionsStore((s) => s.getUserIds);
-  const allEntries = useFormEntriesStore((s) => s.entries);
+  const { forms, auth, permissions, formEntries } = useAppServices();
+  const { categories: allCategories, renameCategory, removeCategory } = forms;
+  const currentUser = auth.currentUser;
+  const getUserIds = permissions.getUserIds;
+  const allEntries = formEntries.entries;
   const navigate = useNavigate();
   const [editTarget, setEditTarget] = useState<FormCategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FormCategory | null>(null);
